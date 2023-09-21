@@ -1,0 +1,7 @@
+#Comando para inicializa o migrate 
+#flask db init
+
+#Comando para atualizar o migrate 
+#flask migrate -m "mensagem" 
+#flask db upgrade
+

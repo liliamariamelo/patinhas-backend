@@ -1,0 +1,8 @@
+__pycache__
+.env
+/venv
+/helpers/cors/__pycache__
+/helpers/database/__pycache__
+/resourses/__pycache__
+/model/__pycache__
+hello_flask.log
