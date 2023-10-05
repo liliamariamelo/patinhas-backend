@@ -1,9 +1,11 @@
+from sqlite3 import IntegrityError
 from flask_restful import Resource, reqparse, marshal
 from model.parceiro import *
 from model.message import *
 from helpers.base_logger import logger
 from helpers.database import db
-
+import re
+from password_strength import PasswordPolicy
 
 parser = reqparse.RequestParser()
 parser.add_argument('nome', type=str, help='Problema no nome', required=True)
@@ -21,6 +23,13 @@ class Parceiros(Resource):
         return marshal(parceiros, parceiro_fields), 200
 
     def post(self):
+        padrao_email =  r'^[\w\.-]+@[\w\.-]+\.\w+$'
+        padrao_senha = PasswordPolicy.from_names(
+            length = 8,
+            uppercase = 1,
+            numbers = 1,
+            special = 1
+        )
         args = parser.parse_args()
         try:
             nome = args["nome"]
@@ -30,7 +39,56 @@ class Parceiros(Resource):
             nascimento = args["nascimento"]
             telefone = args["telefone"]
 
+            if not nome or len(nome) < 3:
+                logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
+                message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
+                return marshal(message, message_fields), 400
+            
+            if not nascimento:
+                logger.info("nascimento não informado")
+                message = Message("nascimento não informado", 2)
+                return marshal(message, message_fields), 400
+            
+            if not email:
+                logger.info("Email não informado")
+                message = Message("Email não informado", 2)
+                return marshal(message, message_fields), 400
 
+            if re.match(padrao_email, email) == None:
+                logger.info("Email informado incorretamente")
+                message = Message("Email informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
+            if not cpf:
+                logger.info("CPF não informado")
+                message = Message("CPF não informado", 2)
+                return marshal(message, message_fields), 400
+            
+            if not re.match(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$', cpf):
+                logger.info("CPF não informado")
+                message = Message("CPF informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
+            if not telefone:
+                logger.info("Telefone não informado")
+                message = Message("Telefone não informado", 2)
+                return marshal(message, message_fields), 400
+            
+            if not re.match(r'^\d{11}$', telefone):
+                logger.info("Telefone não informado")
+                message = Message("Telefone informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
+            if not senha:
+                logger.info("Senha não informada")
+                message = Message("Senha não informada", 2)
+                return marshal(message, message_fields), 400
+            
+            verifySenha = padrao_senha.test(senha)
+            if len(verifySenha) != 0:
+                message = Message("Senha informada incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
             parceiro = Parceiro(nome, cpf, email, senha, nascimento, telefone )
 
             db.session.add(parceiro)
@@ -39,6 +97,15 @@ class Parceiros(Resource):
             logger.info("Parceiro cadastrada com sucesso!")
 
             return marshal(parceiro, parceiro_fields), 201
+        except IntegrityError as e:
+            if 'cpf' in str(e.orig):
+                message = Message("CPF já existe!", 2)
+                return marshal(message, message_fields), 409
+            
+            elif 'email' in str(e.orig):
+                message = Message("Email já existe!", 2)
+                return marshal(message, message_fields), 409
+            
         except Exception as e:
             logger.error(f"error: {e}")
 

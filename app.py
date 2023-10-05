@@ -12,6 +12,8 @@ from resources.parceiro import Parceiros, ParceiroById, ParceiroByNome
 from resources.gestor import Gestores, GestorById, GestorByNome
 from resources.ong import ONGs, ONGByNome, ONGById
 from resources.endereco import Enderecos, EnderecosById
+from resources.animal import Animais
+
 
 load_dotenv()
 
@@ -49,6 +51,8 @@ api.add_resource(ONGById, '/ongs/<int:id>')
 api.add_resource(ONGByNome,'/ongs/<nome>')
 api.add_resource(Enderecos, '/enderecos')
 api.add_resource(EnderecosById, '/enderecos/<int:id>')
+api.add_resource(Animais, '/animais')
+
 
 # Blueprints para Restful
 app.register_blueprint(api_bp)
