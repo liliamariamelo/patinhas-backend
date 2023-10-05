@@ -19,8 +19,8 @@ class Ong(db.Model):
   nome = db.Column(db.String, nullable=False)
   cnpj = db.Column(db.String, unique=True, nullable=False)
   email = db.Column(db.String, unique=True, nullable=False)
-  senha = db.Column(db.String, unique=True, nullable=False)
-  telefone = db.Column(db.String, unique=True, nullable=False)
+  senha = db.Column(db.String, nullable=False)
+  telefone = db.Column(db.String, nullable=False)
   id_endereco = db.Column(db.Integer, db.ForeignKey('endereco.id'))
 
   def __init__(self, nome, cnpj, email, senha, telefone, id_endereco):
