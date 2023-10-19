@@ -13,7 +13,9 @@ from resources.gestor import Gestores, GestorById, GestorByNome
 from resources.ong import ONGs, ONGByNome, ONGById
 from resources.endereco import Enderecos, EnderecosById
 from resources.animal import Animais
-
+from resources.listar import ListarTodos
+from resources.deletar import DeletarPessoa, DeletarParceiro, DeletarAnimal, DeletarGestor, DeletarOng
+from resources.atualizar import AtualizarPessoa, AtualizarParceiro, AtualizarGestor, AtualizarAnimal
 
 load_dotenv()
 
@@ -52,6 +54,19 @@ api.add_resource(ONGByNome,'/ongs/<nome>')
 api.add_resource(Enderecos, '/enderecos')
 api.add_resource(EnderecosById, '/enderecos/<int:id>')
 api.add_resource(Animais, '/animais')
+api.add_resource(ListarTodos, '/listartodos')
+api.add_resource(DeletarOng, '/deletarrong/<int:id>')
+api.add_resource(DeletarPessoa, '/deletarpessoa/<int:id>')
+api.add_resource(DeletarParceiro, '/deletarparceiro/<int:id>')
+api.add_resource(DeletarGestor, '/deletargestor/<int:id>')
+api.add_resource(DeletarAnimal, '/deletaranimal/<int:id>')
+api.add_resource(AtualizarPessoa, '/atualizarpessoa/<int:id>')
+api.add_resource(AtualizarParceiro, '/atualizarparceiro/<int:id>')
+api.add_resource(AtualizarGestor, '/atualizargestor/<int:id>')
+api.add_resource(AtualizarAnimal, '/atualizaranimal/<int:id>')
+
+
+
 
 
 # Blueprints para Restful

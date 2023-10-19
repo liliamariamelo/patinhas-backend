@@ -5,3 +5,4 @@
 #flask migrate -m "mensagem" 
 #flask db upgrade
 
+#source venv/bin/activate
