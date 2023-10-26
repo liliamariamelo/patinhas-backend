@@ -1,12 +1,14 @@
 from resources.parceiro import Parceiro
 from resources.gestor import Gestor
 from resources.ong import Ong
+from resources.endereco import Endereco
 from resources.animal import Animal
 from model.pessoa import *
 from model.parceiro import *
 from model.gestor import *
 from model.ong import *
 from model.animal import *
+from model.endereco import *
 from helpers.database import db
 from helpers.base_logger import logger
 from flask_restful import Resource, reqparse, marshal
@@ -206,8 +208,6 @@ class AtualizarParceiro(Resource):
             message = Message("Erro ao atualizar parceiro", 2)
             return marshal(message, message_fields), 404
 
-
-
 class AtualizarGestor(Resource):
     def put(self, id):
         padrao_senha = PasswordPolicy.from_names(
@@ -312,6 +312,7 @@ class AtualizarGestor(Resource):
             return marshal(message, message_fields), 404
         
 class AtualizarAnimal(Resource):
+
     def put(self, id):
         parser = reqparse.RequestParser()
         parser.add_argument('nome', type=str)
@@ -392,3 +393,91 @@ class AtualizarAnimal(Resource):
 
             message = Message("Erro ao atualizar Animal", 2)
             return marshal(message, message_fields), 404
+        
+class AtualizarOng(Resource):
+    def put(self, id):
+        padrao_senha = PasswordPolicy.from_names(
+            length=8,
+            uppercase=1,
+            numbers=1,
+            special=1
+        )
+        parser = reqparse.RequestParser()
+        parser.add_argument('nome', type=str)
+        parser.add_argument('cnpj', type=str)
+        parser.add_argument('email', type=str)
+        parser.add_argument('senha', type=str)
+        parser.add_argument('telefone', type=str)
+        parser.add_argument('id_endereco', type=dict)
+        args = parser.parse_args()
+
+        try:
+            ong = Ong.query.get(id)
+
+            if ong is None:
+                logger.error(f"ONG {id} não encontrada")
+                message = Message(f"ONG {id} não encontrada", 1)
+                return marshal(message, message_fields), 404  # HTTP 404 para recurso não encontrado
+
+            if args['nome']:
+                ong.nome = args['nome']
+            if args['cnpj']:
+                ong.cnpj = args['cnpj']
+            if args['email']:
+                ong.email = args['email']
+            if args['senha']:
+                ong.senha = args['senha']
+            if args['telefone']:
+                ong.telefone = args['telefone']
+            if args['id_endereco']:
+                ong.id_endereco = args['id_endereco']
+
+            if not args['nome'] or len(args['nome']) < 3:
+                logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
+                message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
+                return marshal(message, message_fields), 400
+
+            if not args['email']:
+                logger.info("Email não informado")
+                message = Message("Email não informado", 2)
+                return marshal(message, message_fields), 400
+
+            if re.match(r'^[\w\.-]+@[\w\.-]+$', args['email']) is None:
+                logger.info("Email informado incorretamente")
+                message = Message("Email informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+
+            if args['cnpj'] and not re.match(r'^\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}$', args['cnpj']):
+                logger.info("CNPJ informado incorretamente")
+                message = Message("CNPJ informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+
+            if not args['telefone']:
+                logger.info("Telefone não informado")
+                message = Message("Telefone não informado", 2)
+                return marshal(message, message_fields), 400
+
+            if not re.match(r'^\d{11}$', args['telefone']):
+                logger.info("Telefone informado incorretamente")
+                message = Message("Telefone informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+
+            if not args['senha']:
+                logger.info("Senha não informada")
+                message = Message("Senha não informada", 2)
+                return marshal(message, message_fields), 400
+
+            if args['senha'] and len(padrao_senha.test(args['senha'])) != 0:
+                logger.info("Senha informada incorretamente")
+                message = Message("Senha informada incorretamente", 2)
+                return marshal(message, message_fields), 400
+
+            db.session.commit()
+
+            logger.info("ONG atualizada com sucesso!")
+            return marshal(ong, ong_fields), 200  # HTTP 200 para sucesso
+        except Exception as e:
+            logger.error(f"error: {e}")
+
+            message = Message("Erro ao atualizar a ong", 2)
+            return marshal(message, message_fields), 500  # HTTP 500 para erro interno do servidor

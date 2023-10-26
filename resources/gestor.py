@@ -4,6 +4,8 @@ from model.ong import *
 from model.message import *
 from helpers.database import db
 from helpers.base_logger import logger
+import re
+from password_strength import PasswordPolicy
 
 parser = reqparse.RequestParser()
 parser.add_argument('nome', type=str, help='Problema no nome', required=True)
@@ -22,6 +24,14 @@ class Gestores(Resource):
         return marshal(gestores, gestor_fields), 200
 
     def post(self):
+        padrao_email =  r'^[\w\.-]+@[\w\.-]+\.\w+$'
+
+        padrao_senha = PasswordPolicy.from_names(
+            length = 8,
+            uppercase = 1,
+            numbers = 1,
+            special = 1
+        )
         args = parser.parse_args()
         try:
             nome = args["nome"]
@@ -32,6 +42,56 @@ class Gestores(Resource):
             telefone = args["telefone"]
             id_ong = args["id_ong"]
 
+            if not nome or len(nome) < 3:
+                logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
+                message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
+                return marshal(message, message_fields), 400
+            
+            if not nascimento:
+                logger.info("nascimento não informado")
+                message = Message("nascimento não informado", 2)
+                return marshal(message, message_fields), 400
+            
+            if not email:
+                logger.info("Email não informado")
+                message = Message("Email não informado", 2)
+                return marshal(message, message_fields), 400
+
+            if re.match(padrao_email, email) == None:
+                logger.info("Email informado incorretamente")
+                message = Message("Email informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
+            if not cpf:
+                logger.info("CPF não informado")
+                message = Message("CPF não informado", 2)
+                return marshal(message, message_fields), 400
+            
+            if not re.match(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$', cpf):
+                logger.info("CPF não informado")
+                message = Message("CPF informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
+            if not telefone:
+                logger.info("Telefone não informado")
+                message = Message("Telefone não informado", 2)
+                return marshal(message, message_fields), 400
+            
+            if not re.match(r'^\d{11}$', telefone):
+                logger.info("Telefone não informado")
+                message = Message("Telefone informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
+            if not senha:
+                logger.info("Senha não informada")
+                message = Message("Senha não informada", 2)
+                return marshal(message, message_fields), 400
+            
+            verifySenha = padrao_senha.test(senha)
+            if len(verifySenha) != 0:
+                message = Message("Senha informada incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
             gestor = Gestor(nome, cpf, email, senha, nascimento, telefone, id_ong )
 
             db.session.add(gestor)
@@ -40,6 +100,14 @@ class Gestores(Resource):
             logger.info("Gestor cadastrada com sucesso!")
 
             return marshal(gestor, gestor_fields), 201
+        except IntegrityError as e:
+            if 'cpf' in str(e.orig):
+                message = Message("CPF já existe!", 2)
+                return marshal(message, message_fields), 409
+            
+            elif 'email' in str(e.orig):
+                message = Message("Email já existe!", 2)
+                return marshal(message, message_fields), 409
         except Exception as e:
             logger.error(f"error: {e}")
 

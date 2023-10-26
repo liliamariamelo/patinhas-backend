@@ -15,8 +15,8 @@ from resources.endereco import Enderecos, EnderecosById
 from resources.animal import Animais
 from resources.listar import ListarTodos
 from resources.deletar import DeletarPessoa, DeletarParceiro, DeletarAnimal, DeletarGestor, DeletarOng
-from resources.atualizar import AtualizarPessoa, AtualizarParceiro, AtualizarGestor, AtualizarAnimal
-
+from resources.atualizar import AtualizarPessoa, AtualizarParceiro, AtualizarGestor, AtualizarAnimal, AtualizarOng
+from resources.adicionar import AdicionarPessoa, AdicionarAnimal, AdicionarGestor, AdicionarParceiro, AdicionarOng
 load_dotenv()
 
 # create the app
@@ -64,8 +64,12 @@ api.add_resource(AtualizarPessoa, '/atualizarpessoa/<int:id>')
 api.add_resource(AtualizarParceiro, '/atualizarparceiro/<int:id>')
 api.add_resource(AtualizarGestor, '/atualizargestor/<int:id>')
 api.add_resource(AtualizarAnimal, '/atualizaranimal/<int:id>')
-
-
+api.add_resource(AtualizarOng, '/atualizarong/<int:id>')
+api.add_resource(AdicionarPessoa, '/adicionarpessoa')
+api.add_resource(AdicionarAnimal, '/adicionaranimal')
+api.add_resource(AdicionarParceiro, '/adicionarparceiro')
+api.add_resource(AdicionarGestor, '/adicionargestor')
+api.add_resource(AdicionarOng, '/adicionarong')
 
 
 
