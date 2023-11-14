@@ -1,11 +1,15 @@
 from flask_restful import Resource, reqparse, marshal
 from model.vacina import *
-from model.message import Message
+from model.message import Message, message_fields
 from helpers.database import db
 from helpers.base_logger import logger
 
+from model.animal import Animal, animal_fields
+
 parser = reqparse.RequestParser()
-parser.add_argument('nome', type=str, help='Problema no nome', required=True)
+parser.add_argument('nome', type=str, help='Problema no nome', required=False)
+parser.add_argument('idAnimal', type=int, help='id do animanl não informado', required=False)
+parser.add_argument('idVacina', type=int, help='id da vacina não informada', required=False)
 
 class Vacinas(Resource):
     def get(self):
@@ -17,6 +21,11 @@ class Vacinas(Resource):
         args = parser.parse_args()
 
         try:
+            if args["nome"] is None:
+                logger.error("Nome nao informado")
+                codigo = Message("Nome não informado", 1)
+                return marshal(codigo, message_fields), 400
+            
             nome = args["nome"]
 
             if not nome or len(nome) < 3:
@@ -85,3 +94,33 @@ class VacinasById(Resource):
 
         message = Message("Vacina deletada com sucesso!", 3)
         return marshal(message, message_fields), 200
+
+class AnimalVacina(Resource):
+    def post(self):
+        args = parser.parse_args()
+        try:
+
+            animal = Animal.query.get(args["idAnimal"])
+            if animal is None:
+                logger.error(f"Animal de id: {args['idAnimal']} nao encontrado")
+
+                codigo = Message(f"Animal de id: {args['idAnimal']} não encontrado", 1)
+                return marshal(codigo, message_fields), 404
+        
+            vacina = Vacina.query.get(args["idVacina"])
+            if vacina is None:
+                logger.error(f"Vacina de id: {args['idVacina']} nao encontrada")
+
+                codigo = Message(f"Vacina de id: {args['idVacina']} não encontrada", 1)
+                return marshal(codigo, message_fields), 404
+            
+            animal.vacinas.append(vacina)
+            db.session.add(animal)
+            db.session.commit()
+
+            logger.info(f"Vacina de id: {args['idVacina']} foi associada ao animal de id: {args['idAnimal']}")
+            return marshal(animal, animal_fields), 201
+        except:
+            logger.error(f"Erro ao criar a vacina")
+            codigo = Message(f"Erro ao crir a vacina", 2)
+            return marshal(codigo, message_fields), 400

@@ -13,6 +13,7 @@ from resources.gestor import Gestores, GestorById, GestorByNome
 from resources.ong import ONGs, ONGByNome, ONGById
 from resources.endereco import Enderecos, EnderecosById
 from resources.animal import Animais
+from resources.vacina import AnimalVacina, Vacinas
 
 
 load_dotenv()
@@ -27,7 +28,7 @@ api = Api(api_bp, prefix="/api")
 postgresUser = os.getenv("POSTGRES_USER")
 postgresPassword = os.getenv("POSTGRES_PASSWORD")
 
-DB_URL = f"postgresql://{postgresUser}:{postgresPassword}@localhost:5432/patinhas-alegres"
+DB_URL = f"postgresql://{postgresUser}:{postgresPassword}@localhost:5432/patinhas"
 app.config["SQLALCHEMY_DATABASE_URI"] = DB_URL
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
@@ -52,6 +53,9 @@ api.add_resource(ONGByNome,'/ongs/<nome>')
 api.add_resource(Enderecos, '/enderecos')
 api.add_resource(EnderecosById, '/enderecos/<int:id>')
 api.add_resource(Animais, '/animais')
+api.add_resource(Vacinas, '/vacina')
+
+api.add_resource(AnimalVacina, '/associarVacina')
 
 
 # Blueprints para Restful
