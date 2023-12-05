@@ -1,8 +1,7 @@
 from resources.parceiro import Parceiro
 from resources.gestor import Gestor
-from resources.ong import Ong
+from resources.ong import ONG
 from resources.animal import Animal
-from model.pessoa import *
 from model.parceiro import *
 from model.gestor import *
 from model.ong import *
@@ -11,21 +10,6 @@ from helpers.database import db
 from helpers.base_logger import logger
 from flask_restful import Resource, marshal
 from model.message import *
-
-class DeletarPessoa(Resource):
-    def delete(self, id):
-        pessoa = Pessoa.query.get(id)
-
-        if pessoa is None:
-            logger.error(f"Pessoa {id} não encontrada")
-            message = Message(f"Pessoa {id} não encontrada", 1)
-            return marshal(message, message_fields)
-
-        db.session.delete(pessoa)
-        db.session.commit()
-
-        message = Message("Pessoa deletada com sucesso!", 3)
-        return marshal(message, message_fields), 200
 
 class DeletarParceiro(Resource):
     def delete(self, id):
@@ -59,7 +43,7 @@ class DeletarGestor(Resource):
     
 class DeletarOng(Resource):
     def delete(self, id):
-        ong = Ong.query.get(id)
+        ong = ONG.query.get(id)
 
         if ong is None:
             logger.error(f"Ong {id} não encontrada")

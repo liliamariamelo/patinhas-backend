@@ -1,8 +1,13 @@
-#Comando para inicializa o migrate 
+#Comando para inicializar o migrate 
 #flask db init
 
 #Comando para atualizar o migrate 
 #flask migrate -m "mensagem" 
+#flask db migrate
 #flask db upgrade
 
+#Ativar a venv
 #source venv/bin/activate
+
+#Instalar as dependências
+# pip install -r requirements.txt

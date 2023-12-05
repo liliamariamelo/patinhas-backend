@@ -1,11 +1,9 @@
 from flask_restful import fields
 from helpers.database import db
-#from model.animal import * 
 
 vacina_fields = {
   'id': fields.Integer,
   'nome': fields.String,
- # 'animal' : fields.Nested(animal_fields),
 }
 
 class Vacina(db.Model):
@@ -13,13 +11,12 @@ class Vacina(db.Model):
 
   id = db.Column(db.Integer, primary_key=True)
   nome = db.Column(db.String, nullable=False)
-  #id_animal= db.Column(db.Integer, db.ForeignKey("animal.id"), nullable=True)
-  #animal = db.relationship("Animal", backref="vacina")
+  animal_id = db.Column(db.Integer, db.ForeignKey("animal.id"), nullable=True)
 
-  def __init__(self, nome, animal):
+
+  def __init__(self, nome):
     self.nome = nome
-    self.animal = animal
   
-    
+  
   def __repr__(self):
     return f'<Vacina>'

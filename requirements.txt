@@ -16,4 +16,5 @@ flask-mail==0.9.1
 # psycopg2==2.9.6
 psycopg2==2.9.6
 Werkzeug===2.3.4
+password-strength==0.0.3.post2
 

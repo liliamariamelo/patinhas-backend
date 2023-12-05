@@ -1,6 +1,6 @@
 from flask_restful import fields
 from helpers.database import db
-from model.endereco import endereco_fields
+from model.gestor import * 
 
 ong_fields = {
   'id': fields.Integer,
@@ -9,10 +9,18 @@ ong_fields = {
   'email': fields.String,
   'senha': fields.String,
   'telefone': fields.String,
-  'endereco': fields.Nested(endereco_fields),
+  'logradouro': fields.String,
+  'numero': fields.Integer,
+  'bairro': fields.String,
+  'complemento': fields.String,
+  'referencia': fields.String,
+  'cep': fields.String,
+  'cidade': fields.String,
+  'estado': fields.String,
+  'id_gestor' : fields.Integer,
 }
 
-class Ong(db.Model):
+class ONG(db.Model):
   __tablename__ = "ong"
 
   id = db.Column(db.Integer, primary_key=True)
@@ -21,16 +29,31 @@ class Ong(db.Model):
   email = db.Column(db.String, unique=True, nullable=False)
   senha = db.Column(db.String, nullable=False)
   telefone = db.Column(db.String, nullable=False)
-  id_endereco = db.Column(db.Integer, db.ForeignKey('endereco.id'))
+  logradouro = db.Column(db.String, nullable=False)
+  numero = db.Column(db.String, nullable=False)
+  bairro = db.Column(db.String, nullable=False)
+  complemento = db.Column(db.String, nullable=False)
+  referencia = db.Column(db.String, nullable=False)
+  cep = db.Column(db.String, nullable=False)
+  cidade = db.Column(db.String, nullable=False)
+  estado = db.Column(db.String, nullable=False) 
+  id_gestor = db.Column(db.Integer, db.ForeignKey("gestor_ong.id"), nullable=True)
 
-  def __init__(self, nome, cnpj, email, senha, telefone, id_endereco):
-    super().__init__()
+  def __init__(self, nome, cnpj, email, senha, telefone, logradouro, numero, bairro, complemento, referencia, cep, cidade, estado, id_gestor):
     self.nome = nome
     self.cnpj = cnpj
     self.email = email
     self.senha = senha
     self.telefone = telefone
-    self.id_endereco = id_endereco
+    self.logradouro = logradouro
+    self.numero = numero
+    self.bairro = bairro
+    self.referencia = referencia
+    self.complemento = complemento
+    self.cep = cep 
+    self.cidade = cidade
+    self.estado = estado
+    self.id_gestor = id_gestor
 
   def __repr__(self):
     return f'<Ong>'

@@ -1,118 +1,17 @@
 from resources.parceiro import Parceiro
 from resources.gestor import Gestor
-from resources.ong import Ong
-from resources.endereco import Endereco
+from resources.ong import *
 from resources.animal import Animal
-from model.pessoa import *
 from model.parceiro import *
 from model.gestor import *
 from model.ong import *
 from model.animal import *
-from model.endereco import *
 from helpers.database import db
 from helpers.base_logger import logger
 from flask_restful import Resource, reqparse, marshal
 from model.message import *
 import re
 from password_strength import PasswordPolicy
-
-
-class AtualizarPessoa(Resource):
-    def put(self, id):
-        padrao_senha = PasswordPolicy.from_names(
-            length = 8,
-            uppercase = 1,
-            numbers = 1,
-            special = 1
-        )
-        parser = reqparse.RequestParser()
-        parser.add_argument('nome', type=str)
-        parser.add_argument('cpf', type=str)
-        parser.add_argument('email', type=str)
-        parser.add_argument('senha', type=str)
-        parser.add_argument('nascimento', type=str)
-        parser.add_argument('telefone', type=str)
-        args = parser.parse_args()
-
-        
-        try:
-            pessoa = Pessoa.query.get(id)
-
-            if pessoa is None:
-                logger.error(f"Pessoa {id} não encontrada")
-                message = Message(f"Pessoa {id} não encontrada", 1)
-                return marshal(message, message_fields)
-            
-            if args['nome']:
-                pessoa.nome = args['nome']
-            if args['cpf']:
-                pessoa.cpf = args['cpf']
-            if args['email']:
-                pessoa.email = args['email']
-            if args['senha']:
-                pessoa.senha = args['senha']
-            if args['nascimento']:
-                pessoa.nascimento = args['nascimento']
-            if args['telefone']:
-                pessoa.telefone = args['telefone']
-
-
-            if not args['nome'] or len(args['nome']) < 3:
-                logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
-                message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
-                return marshal(message, message_fields), 400
-            
-            if not args['nascimento']:
-                logger.info("nascimento não informado")
-                message = Message("nascimento não informado", 2)
-                return marshal(message, message_fields), 400
-            
-            if not args['email']:
-                logger.info("Email não informado")
-                message = Message("Email não informado", 2)
-                return marshal(message, message_fields), 400
-
-            if re.match(r'^[\w\.-]+@[\w\.-]+$', args['email']) is None:
-                logger.info("Email informado incorretamente")
-                message = Message("Email informado incorretamente", 2)
-                return marshal(message, message_fields), 400
-            
-            if args['cpf'] and not re.match(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$', args['cpf']):
-                logger.info("CPF não informado")
-                message = Message("CPF informado incorretamente", 2)
-                return marshal(message, message_fields), 400
-            
-            if not args['telefone']:
-                logger.info("Telefone não informado")
-                message = Message("Telefone não informado", 2)
-                return marshal(message, message_fields), 400
-            
-            if not re.match(r'^\d{11}$', args['telefone']):
-                logger.info("Telefone não informado")
-                message = Message("Telefone informado incorretamente", 2)
-                return marshal(message, message_fields), 400
-            
-            if not args['senha']:
-                logger.info("Senha não informada")
-                message = Message("Senha não informada", 2)
-                return marshal(message, message_fields), 400
-            
-            if args['senha'] and len(padrao_senha.test(args['senha'])) != 0:
-                message = Message("Senha informada incorretamente", 2)
-                return marshal(message, message_fields), 400
-            
-
-            #pessoa = Pessoa(nome, cpf, email, senha, nascimento, telefone)
-
-            db.session.commit()
-
-            logger.info("Pessoa atualizada com sucesso!")
-            return marshal(pessoa, pessoa_fields), 200
-        except Exception as e:
-            logger.error(f"error: {e}")
-
-            message = Message("Erro ao atualizar pessoa", 2)
-            return marshal(message, message_fields), 404
 
 class AtualizarParceiro(Resource):
     def put(self, id):
@@ -223,7 +122,6 @@ class AtualizarGestor(Resource):
         parser.add_argument('senha', type=str)
         parser.add_argument('nascimento', type=str)
         parser.add_argument('telefone', type=str)
-        parser.add_argument('id_ong', type=str)
         args = parser.parse_args()
 
         
@@ -247,9 +145,6 @@ class AtualizarGestor(Resource):
                 gestor.nascimento = args['nascimento']
             if args['telefone']:
                 gestor.telefone = args['telefone']
-            if args['id_ong']:
-                gestor.id_ong = args['id_ong']
-
 
 
             if not args['nome'] or len(args['nome']) < 3:
@@ -262,10 +157,6 @@ class AtualizarGestor(Resource):
                 message = Message("nascimento não informado", 2)
                 return marshal(message, message_fields), 400
             
-            if not args['id_ong']:
-                logger.info("id_ong não informado")
-                message = Message("id_ong não informado", 2)
-                return marshal(message, message_fields), 400
             
             if not args['email']:
                 logger.info("Email não informado")
@@ -348,8 +239,6 @@ class AtualizarAnimal(Resource):
             if args['vacina_em_dia']:
                 animal.vacina_em_dia = args['vacina_em_dia']
 
-
-
             if not args['nome'] or len(args['nome']) < 3:
                 logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
                 message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
@@ -408,11 +297,18 @@ class AtualizarOng(Resource):
         parser.add_argument('email', type=str)
         parser.add_argument('senha', type=str)
         parser.add_argument('telefone', type=str)
-        parser.add_argument('id_endereco', type=dict)
+        parser.add_argument('logradouro', type=str)
+        parser.add_argument('numero', type=int)
+        parser.add_argument('bairro', type=str)
+        parser.add_argument('complemento', type=str)
+        parser.add_argument('referencia', type=str)
+        parser.add_argument('cep', type=str)
+        parser.add_argument('cidade', type=str)
+        parser.add_argument('estado', type=str)
         args = parser.parse_args()
 
         try:
-            ong = Ong.query.get(id)
+            ong = ONG.query.get(id)
 
             if ong is None:
                 logger.error(f"ONG {id} não encontrada")
@@ -429,8 +325,24 @@ class AtualizarOng(Resource):
                 ong.senha = args['senha']
             if args['telefone']:
                 ong.telefone = args['telefone']
-            if args['id_endereco']:
-                ong.id_endereco = args['id_endereco']
+            if args['logradouro']:
+                ong.logradouro = args['logradouro']
+            if args['numero']:
+                ong.numero = args['numero']
+            if args['bairro']:
+                ong.bairro = args['bairro']
+            if args['complemento']:
+                ong.complemento = args['complemento']
+            if args['referencia']:
+                ong.referencia = args['referencia']
+            if args['cep']:
+                ong.cep = args['cep']
+            if args['cidade']:
+                ong.cidade = args['cidade']
+            if args['estado']:
+                ong.estado = args['estado']
+            if args['id_gestor']:
+                ong.id_gestor = args['id_gestor']
 
             if not args['nome'] or len(args['nome']) < 3:
                 logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
@@ -472,6 +384,17 @@ class AtualizarOng(Resource):
                 message = Message("Senha informada incorretamente", 2)
                 return marshal(message, message_fields), 400
 
+            if (
+                not args['logradouro'] or len(args['logradouro']) < 3 or
+                not args['bairro'] or len(args['bairro']) < 3 or
+                not args['complemento'] or len(args['complemento']) < 3 or
+                not args['referencia'] or len(args['referencia']) < 3 or
+                not args['cidade'] or len(args['cidade']) < 3 or 
+                not args['estado'] or len(args['estado']) < 3
+            ):
+                logger.info("O campo não informado ou não tem no mínimo 3 caracteres")
+                message = Message("O campo não informado ou não tem no mínimo 3 caracteres", 2)
+                return marshal(message, message_fields), 400
             db.session.commit()
 
             logger.info("ONG atualizada com sucesso!")

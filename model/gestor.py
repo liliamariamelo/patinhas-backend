@@ -1,29 +1,35 @@
 from flask_restful import fields
 from helpers.database import db
-from model.pessoa import Pessoa
-from model.ong import *
 
 gestor_fields = {
   'id': fields.Integer,
   'nome': fields.String,
+  'cpf' : fields.String,
   'nascimento': fields.String,
+  'telefone': fields.String,
   'email': fields.String,
   'senha': fields.String,
-  'telefone': fields.String,
-  'id_ong': fields.Integer,
 }
 
-class Gestor(Pessoa):
+class Gestor(db.Model):
     __tablename__ = "gestor_ong"
 
-    id_pessoa = db.Column(db.Integer ,db.ForeignKey("pessoa.id"), primary_key=True)
-    id_ong = db.Column(db.Integer, db.ForeignKey("ong.id"), nullable=True)
+    id = db.Column(db.Integer, primary_key=True)
+    nome = db.Column(db.String, nullable=False)
+    cpf = db.Column(db.String, unique=True, nullable=False)
+    nascimento = db.Column(db.Date, nullable=False)
+    telefone = db.Column(db.String, unique=True, nullable=False)
+    email = db.Column(db.String, unique=True, nullable=False)
+    senha = db.Column(db.String, nullable=False)
 
-    __mapper_args__ = {"polymorphic_identity": "gestor_ong"}
+    def __init__(self, nome, cpf, nascimento, telefone,  email, senha):
+      self.nome = nome
+      self.cpf = cpf
+      self.nascimento = nascimento
+      self.telefone = telefone
+      self.email = email
+      self.senha = senha
 
-    def __init__(self, nome, cpf, email, senha,  nascimento, telefone, id_ong):
-        super().__init__(nome, cpf, email, senha, nascimento, telefone)
-        self.id_ong = id_ong
 
     def __repr__(self):
-        return f'<Gestor {self.nome}>'
+        return f'<Gestor>'
