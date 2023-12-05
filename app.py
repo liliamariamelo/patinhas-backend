@@ -51,9 +51,6 @@ api.add_resource(ONGs, '/ongs')
 api.add_resource(ONGById, '/ongs/<int:id>')
 api.add_resource(ONGByNome,'/ongs/<nome>')
 api.add_resource(Animais, '/animais')
-api.add_resource(Vacinas, '/vacina')
-
-api.add_resource(AnimalVacina, '/associarVacina')
 
 api.add_resource(ListarTodos, '/listartodos')
 
