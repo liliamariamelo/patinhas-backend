@@ -12,6 +12,8 @@ class Vacina(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   nome = db.Column(db.String, nullable=False)
   animal_id = db.Column(db.Integer, db.ForeignKey("animal.id"), nullable=True)
+ # animal = db.relationship("Animal", backref="vacina")
+
 
 
   def __init__(self, nome):

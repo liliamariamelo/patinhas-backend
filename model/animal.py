@@ -27,7 +27,7 @@ class Animal(db.Model):
   vacina_em_dia = db.Column(db.Boolean, nullable=False)
 
   vacinas = db.relationship("Vacina", backref="animal")
-  #agendamentos = db.relationship("Agendamento", backref="animal")
+
 
   def __init__(self, nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia):
     self.nome = nome
@@ -40,3 +40,6 @@ class Animal(db.Model):
     
   def __repr__(self):
     return f'<Animal {self.nome}>'
+  
+
+  

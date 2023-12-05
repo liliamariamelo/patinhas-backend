@@ -13,6 +13,7 @@ parser.add_argument('idade', type=int, help='Problema no idade', required=True)
 parser.add_argument('origem', type=str, help='Problema no origem', required=True)
 parser.add_argument('descricao_origem', type=str, help='Problema na descricao de origem', required=True)
 parser.add_argument('vacina_em_dia', type=bool, help='Problema se as vacinas estão em dia', required=True)
+# parser.add_argument('vacina', type=str, help='Problema no registro das vacinas', required=True)
 
 class Animais(Resource):
     def get(self):
