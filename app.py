@@ -5,6 +5,7 @@ from flask import Flask, Blueprint
 
 from helpers.cors import cors
 from helpers.database import db, migrate
+from resources.pessoa import Pessoas
 from resources.parceiro import Parceiros, ParceiroById, ParceiroByNome
 from resources.gestor import Gestores, GestorById, GestorByNome
 from resources.ong import ONGs, ONGByNome, ONGById
@@ -16,7 +17,7 @@ from resources.adicionar import  AdicionarAnimal, AdicionarGestor, AdicionarParc
 from resources.adicionarongadmin import AdicionarONG
 from resources.vacina import AnimalVacina, Vacinas
 from resources.agendamento import Agendamentos
-from resources.relatoriodespesas import RelatoriosDespesas
+from resources.relatoriodespesas import RelatoriosDespesas, RelatorioByFiltro
 load_dotenv()
 
 # create the app
@@ -38,6 +39,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 cors.init_app(app)
 migrate.init_app(app, db)
+
+api.add_resource(Pessoas, '/pessoas')
 
 api.add_resource(Parceiros, '/parceiros')
 api.add_resource(ParceiroById, '/parceiros/<int:id>')
@@ -75,6 +78,8 @@ api.add_resource(AnimalVacina, '/AnimalVacina')
 api.add_resource(Agendamentos, '/agendamento')
 
 api.add_resource(RelatoriosDespesas, '/relatorio')
+api.add_resource(RelatorioByFiltro, '/relatoriobusca')
+
 
 
 # Blueprints para Restful

@@ -1,8 +1,8 @@
-#Comando para inicializar o migrate 
+#Comando para inicializar o migrate
 #flask db init
 
-#Comando para atualizar o migrate 
-#flask migrate -m "mensagem" 
+#Comando para atualizar o migrate
+#flask migrate -m "mensagem"
 #flask db migrate
 #flask db upgrade
 
@@ -11,3 +11,7 @@
 
 #Instalar as dependências
 # pip install -r requirements.txt
+
+#Instalar bibliotecas
+#pip install Flask Flask-RESTful Flask-SQLAlchemy Flask-Uploads
+#pip install Werkzeug

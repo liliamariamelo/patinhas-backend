@@ -8,7 +8,7 @@ relatoriodespesas_fields = {
   'data': fields.String,
   'observacoes': fields.String,
   'mes_Correspondente' : fields.Integer,
-  
+
 }
 
 class RelatorioDespesas(db.Model):
@@ -20,9 +20,7 @@ class RelatorioDespesas(db.Model):
   data = db.Column(db.String, nullable=False)
   observacoes = db.Column(db.String)
   mes_Correspondente = db.Column(db.Integer, nullable=False)
- 
-  
-  
+
   def __init__(self, categoria, valor, data, observacoes, mes_Correspondente):
     self.categoria = categoria
     self.valor = valor
@@ -33,4 +31,4 @@ class RelatorioDespesas(db.Model):
 
   def __repr__(self):
     return f'<RelatorioDespesas>'
-  
+
