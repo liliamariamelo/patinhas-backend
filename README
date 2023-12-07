@@ -15,7 +15,7 @@
 #Instalar as dependências
 # pip install -r requirements.txt
 
-#Como importar o arquivo vacinas.cvs?
+#Como importar o arquivo vacinas.csv?
 #No PGAdmin clique na database e selecione a tabela vacina;
 #com o botão direito selecione Import/Export e selecione o arquivo;
 #no mesmo modal da importação selecione Columns e só deixe a coluna nome.
