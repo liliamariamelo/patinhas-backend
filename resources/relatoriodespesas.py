@@ -10,7 +10,7 @@ parser.add_argument('categoria', type=str, help='Problema na categoria', require
 parser.add_argument('valor', type=float, help='Problema no valor das despesas', required=True)
 parser.add_argument('data', type=str, help='Problema na data', required=True)
 parser.add_argument('observacoes', type=str, help='Problema nas observações', required=True)
-parser.add_argument('mes_Correspondente', type=str, help='Problema no mês correspondente', required=True)
+parser.add_argument('mes_Correspondente', type=int, help='Problema no mês correspondente', required=True)
 
 class RelatoriosDespesas(Resource):
     def get(self):
@@ -114,43 +114,4 @@ class RelatorioDespesasByMes(Resource):
         logger.info(f"Relatório {id} encontrado com sucesso!")
         return marshal(relatorio, relatoriodespesas_fields), 200
 
-class RelatórioMe(Resource):
-    def get(self):
-        relatorio = RelatorioDespesas.query
 
-        if relatorio is None:
-            logger.error(f"Relatório {id} não encontrada")
-
-            message = Message(f"Relatório {id} não encontrada", 1)
-            return marshal(message), 404
-
-        logger.info(f"Relatório {id} encontrada com sucesso!")
-        return marshal(relatorio, relatoriodespesas_fields), 200
-
-
-class RelatorioByFiltro(Resource):
-    def get(self, query):
-        try:
-            relatorios = RelatoriosDespesas.query.filter(
-                or_(
-                    RelatoriosDespesas.categoria == query,
-                    RelatoriosDespesas.mes_Correspondente == query,
-                )
-            ).all()
-        except ValueError:
-            relatorios = RelatoriosDespesas.query.filter(
-                or_(
-                    RelatoriosDespesas.valor.ilike(f"%{query}%"),
-                    RelatoriosDespesas.data.ilike(f"%{query}%"),
-                    RelatoriosDespesas.observacoes.ilike(f"%{query}%"),
-                )
-            ).all()
-
-        if not relatorios:
-            logger.error(f"Relatório {query} não encontrado")
-
-            message = Message(f"Relatório {query} não encontrado", 1)
-            return marshal(message, message_fields), 404
-
-        logger.info(f"Relatório {query} encontrado com sucesso!")
-        return marshal(relatorios, relatoriodespesas_fields), 200
