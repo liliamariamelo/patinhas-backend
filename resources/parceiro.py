@@ -1,4 +1,4 @@
-from psycopg2 import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from flask_restful import Resource, reqparse, marshal
 from model.parceiro import *
 from model.message import *
@@ -38,34 +38,33 @@ class Parceiros(Resource):
             telefone = args["telefone"]
             email = args["email"]
             senha = args["senha"]
-            
+
             if not nome or len(nome) < 3:
                 logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
                 message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not cpf:
                 logger.info("CPF não informado")
                 message = Message("CPF não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not re.match(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$', cpf):
                 logger.info("CPF não informado")
                 message = Message("CPF informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
-                        
+
+
             if not nascimento:
                 logger.info("nascimento não informado")
                 message = Message("nascimento não informado", 2)
                 return marshal(message, message_fields), 400
-            
-            
+
             if not telefone:
                 logger.info("Telefone não informado")
                 message = Message("Telefone não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not re.match(r'^\d{11}$', telefone):
                 logger.info("Telefone não informado")
                 message = Message("Telefone informado incorretamente", 2)
@@ -80,36 +79,35 @@ class Parceiros(Resource):
                 logger.info("Email informado incorretamente")
                 message = Message("Email informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
-            
+
             if not senha:
                 logger.info("Senha não informada")
                 message = Message("Senha não informada", 2)
                 return marshal(message, message_fields), 400
-            
+
             verifySenha = padrao_senha.test(senha)
             if len(verifySenha) != 0:
                 message = Message("Senha informada incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             parceiro = Parceiro(nome, cpf, nascimento, telefone, email, senha)
 
             db.session.add(parceiro)
             db.session.commit()
 
             logger.info("Parceiro cadastrado com sucesso!")
-            
+
             return marshal(parceiro, parceiro_fields), 201
-        
+
         except IntegrityError as e:
             if 'cpf' in str(e.orig):
                 message = Message("CPF já existe!", 2)
                 return marshal(message, message_fields), 409
-            
+
             elif 'email' in str(e.orig):
                 message = Message("Email já existe!", 2)
                 return marshal(message, message_fields), 409
-            
+
         except Exception as e:
             logger.error(f"error: {e}")
 
@@ -124,7 +122,7 @@ class ParceiroById(Resource):
             logger.error(f"Parceiro {id} não encontrada")
 
             message = Message(f"Parceiro {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Parceiro {id} encontrada com sucesso!")
         return marshal(parceiro, parceiro_fields)
@@ -147,7 +145,7 @@ class ParceiroById(Resource):
             parceiro.telefone = args["telefone"]
             parceiro.email = args["email"]
             parceiro.senha = args["senha"]
-          
+
             db.session.add(parceiro)
             db.session.commit()
 
@@ -159,7 +157,7 @@ class ParceiroById(Resource):
             message = Message("Erro ao atualizar parceiro", 2)
             return marshal(message, message_fields), 404
 
-   
+
     def delete(self, id):
         parceiro = Parceiro.query.get(id)
 
@@ -182,7 +180,7 @@ class ParceiroByNome(Resource):
             logger.error(f"Parceiro {id} não encontrado")
 
             message = Message(f"Parceiro {id} não encontrado", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Parceiro {id} encontrado com sucesso!")
         return marshal(parceiro, parceiro_fields), 200
@@ -195,7 +193,7 @@ class ParceiroMe(Resource):
             logger.error(f"Parceiro {id} não encontrada")
 
             message = Message(f"Parceiro {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Parceiro {id} encontrada com sucesso!")
         return marshal(parceiro, parceiro_fields), 200

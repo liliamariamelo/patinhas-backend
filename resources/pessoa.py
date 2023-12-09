@@ -1,20 +1,25 @@
 from flask_restful import Resource, reqparse, marshal
-from psycopg2 import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from model.pessoa import *
 from model.message import *
 from helpers.base_logger import logger
 from helpers.database import db
 import re
 from password_strength import PasswordPolicy
+from datetime import datetime, time
 
+
+def parse_date(date_string):
+    date = datetime.strptime(date_string, '%Y-%m-%d')
+    return date.date()
 
 parser = reqparse.RequestParser()
 parser.add_argument('nome', type=str, help='Problema no nome', required=True)
 parser.add_argument('cpf', type=str, help='Problema no cpf', required=True)
+parser.add_argument('nascimento', type=parse_date, help='Problema no nascimento', required=True)
+parser.add_argument('telefone', type=str, help='Problema no telefone', required=True)
 parser.add_argument('email', type=str, help='Problema no email', required=True)
 parser.add_argument('senha', type=str, help='Problema no senha', required=True)
-parser.add_argument('nascimento', type=str, help='Problema no nascimento', required=True)
-parser.add_argument('telefone', type=str, help='Problema no telefone', required=True)
 
 
 class Pessoas(Resource):
@@ -37,10 +42,10 @@ class Pessoas(Resource):
 
             nome = args["nome"]
             cpf = args["cpf"]
-            email = args["email"]
-            senha = args["senha"]
             nascimento = args["nascimento"]
             telefone = args["telefone"]
+            email = args["email"]
+            senha = args["senha"]
 
 
             if not nome or len(nome) < 3:
@@ -94,7 +99,7 @@ class Pessoas(Resource):
                 return marshal(message, message_fields), 400
 
 
-            pessoa = Pessoa(nome, cpf, email, senha, nascimento, telefone)
+            pessoa = Pessoa(nome, cpf, nascimento, telefone, email, senha )
 
             db.session.add(pessoa)
             db.session.commit()
@@ -126,7 +131,7 @@ class PessoaById(Resource):
             logger.error(f"Pessoa {id} não encontrada")
 
             message = Message(f"Pessoa {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Pessoa {id} encontrada com sucesso!")
         return marshal(pessoa, pessoa_fields)
@@ -145,10 +150,10 @@ class PessoaById(Resource):
 
             pessoa.nome = args["nome"]
             pessoa.cpf = args["cpf"]
-            pessoa.email = args["email"]
-            pessoa.senha = args["senha"]
             pessoa.nascimento = args["nascimento"]
             pessoa.telefone = args["telefone"]
+            pessoa.email = args["email"]
+            pessoa.senha = args["senha"]
 
             db.session.add(pessoa)
             db.session.commit()
@@ -184,7 +189,7 @@ class PessoaByNome(Resource):
             logger.error(f"Pessoa {id} não encontrado")
 
             message = Message(f"Pessoa {id} não encontrado", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Pessoa {id} encontrado com sucesso!")
         return marshal(pessoa, pessoa_fields), 200
@@ -197,7 +202,7 @@ class PessoaMe(Resource):
             logger.error(f"Pessoa {id} não encontrada")
 
             message = Message(f"Pessoa {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Pessoa {id} encontrada com sucesso!")
         return marshal(pessoa, pessoa_fields), 200

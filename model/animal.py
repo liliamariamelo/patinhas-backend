@@ -9,10 +9,7 @@ animal_fields = {
   'especie': fields.String,
   'raca': fields.String,
   'idade': fields.Integer,
-  'origem' : fields.String, #resgatado ou doado
-  'descricao_origem' : fields.String,
   'vacina_em_dia': fields.Boolean,
-  'vacinas' : fields.List(fields.Nested(vacina_fields)),
 }
 
 
@@ -25,26 +22,17 @@ class Animal(db.Model):
   especie = db.Column(db.String, nullable=False)
   raca = db.Column(db.String, nullable=False)
   idade = db.Column(db.Integer, nullable=False)
-  origem = db.Column(db.String, nullable=False)
-  descricao_origem = db.Column(db.String, nullable=False)
 
   vacina_em_dia = db.Column(db.Boolean, nullable=False)
 
-  vacinas = db.relationship("Vacina", backref="animal")
-
-
-  def __init__(self, nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia):
+  def __init__(self, nome, especie, raca, idade, vacina_em_dia):
     self.nome = nome
     self.especie = especie
     self.raca = raca
     self.idade = idade
-    self.origem = origem
-    self.descricao_origem = descricao_origem
     self.vacina_em_dia = vacina_em_dia
 
-    
+
   def __repr__(self):
     return f'<Animal {self.nome}>'
-  
 
-  

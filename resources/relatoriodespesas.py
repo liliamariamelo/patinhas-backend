@@ -53,7 +53,7 @@ class RelatorioDespesasById(Resource):
             logger.error(f"Relatório {id} não encontrada")
 
             message = Message(f"Relatório {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Relatório {id} encontrada com sucesso!")
         return marshal(relatorio, relatoriodespesas_fields)
@@ -109,7 +109,7 @@ class RelatorioDespesasByMes(Resource):
             logger.error(f"Relatório {id} não encontrado")
 
             message = Message(f"Relatório {id} não encontrado", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Relatório {id} encontrado com sucesso!")
         return marshal(relatorio, relatoriodespesas_fields), 200

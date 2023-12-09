@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
         "listartodos"
-    ]
+    ],
+    "python.analysis.typeCheckingMode": "basic"
 }

@@ -16,11 +16,8 @@ parser.add_argument('senha', type=str, help='Problema no senha', required=True)
 parser.add_argument('logradouro', type=str, help='Problema no logradouro', required=True)
 parser.add_argument('numero', type=int, help='Problema no numero', required=True)
 parser.add_argument('bairro', type=str, help='Problema no bairro', required=True)
-parser.add_argument('complemento', type=str, help='Problema na complemento', required=True)
-parser.add_argument('referencia', type=str, help='Problema no referencia', required=True)
 parser.add_argument('cep', type=str, help='Problema no cep', required=True)
 parser.add_argument('cidade', type=str, help='Problema na cidade', required=True)
-parser.add_argument('estado', type=str, help='Problema no estado', required=True)
 parser.add_argument('id_gestor', type=int, help='Problema no id do gestor', required=False)
 
 class ONGs(Resource):
@@ -47,13 +44,10 @@ class ONGs(Resource):
             logradouro = args["logradouro"],
             numero = args["numero"],
             bairro = args["bairro"],
-            complemento = args["complemento"],
-            referencia = args["referencia"],
             cep = args["cep"],
             cidade=args["cidade"],
-            estado=args["estado"],
             id_gestor = args["id_gestor"]
-            
+
 
             if not nome or len(nome) < 3:
                 logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
@@ -69,38 +63,38 @@ class ONGs(Resource):
                 logger.info("Email informado incorretamente")
                 message = Message("Email informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not cnpj:
                 logger.info("CNPJ não informado")
                 message = Message("CNPJ não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not re.match(r'^\d{2}\.\d{3}\.\d{3}\/\d{4}\-\d{2}$', cnpj):
                 logger.info("CNPJ não informado")
                 message = Message("CNPJ informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not telefone:
                 logger.info("Telefone não informado")
                 message = Message("Telefone não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not re.match(r'^\d{11}$', telefone):
                 logger.info("Telefone não informado")
                 message = Message("Telefone informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not senha:
                 logger.info("Senha não informada")
                 message = Message("Senha não informada", 2)
                 return marshal(message, message_fields), 400
-            
+
             verifySenha = padrao_senha.test(senha)
             if len(verifySenha) != 0:
                 message = Message("Senha informada incorretamente", 2)
                 return marshal(message, message_fields), 400
 
-            ong = ONG(nome, cnpj, telefone, email, senha, logradouro, numero, bairro, complemento, referencia, cep, cidade, estado, id_gestor)
+            ong = ONG(nome, cnpj, telefone, email, senha, logradouro, numero, bairro, cep, cidade, id_gestor)
 
             db.session.add(ong)
             db.session.commit()
@@ -108,16 +102,16 @@ class ONGs(Resource):
             logger.info("ONG cadastrada com sucesso!")
 
             return marshal(ong, ong_fields), 201
-        
+
         except IntegrityError as e:
             if 'cnpj' in str(e.orig):
                 message = Message("CNPJ já existe!", 2)
                 return marshal(message, message_fields), 409
-            
+
             elif 'email' in str(e.orig):
                 message = Message("Email já existe!", 2)
                 return marshal(message, message_fields), 409
-            
+
 
         except Exception as e:
             logger.error(f"error: {e}")
@@ -159,13 +153,10 @@ class ONGById(Resource):
             ong.logradouro = args["logradouro"]
             ong.numero = args["numero"]
             ong.bairro = args["bairro"]
-            ong.complemento = args["complemento"]
-            ong.referencia = args["referencia"]
             ong.cep = args["cep"]
             ong.cidade=args["cidade"]
-            ong.estado=args["estado"]
             ong.id_gestor = args["id_gestor"]
-            
+
             db.session.add(ong)
             db.session.commit()
 

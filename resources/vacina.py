@@ -8,8 +8,8 @@ from model.animal import Animal, animal_fields
 
 parser = reqparse.RequestParser()
 parser.add_argument('nome', type=str, help='Problema no nome', required=False)
-parser.add_argument('idAnimal', type=int, help='id do animal não informado', required=False)
-parser.add_argument('idVacina', type=int, help='id da vacina não informada', required=False)
+parser.add_argument('animal_id', type=int, help='id do animal não informado', required=False)
+parser.add_argument('vacina_id', type=int, help='id da vacina não informada', required=False)
 
 class Vacinas(Resource):
     def get(self):
@@ -25,13 +25,15 @@ class Vacinas(Resource):
                 logger.error("Nome nao informado")
                 codigo = Message("Nome não informado", 1)
                 return marshal(codigo, message_fields), 400
-            
+
             nome = args["nome"]
+            animal_id = args["animal_id"]
 
             if not nome or len(nome) < 3:
                 return {"message": "O campo 'nome' não pode ser nulo e deve ter no mínimo três caracteres."}, 400
 
-            vacina = Vacina(nome=nome)
+            vacina = Vacina(nome=nome, animal_id=animal_id)
+
 
             db.session.add(vacina)
             db.session.commit()
@@ -100,27 +102,27 @@ class AnimalVacina(Resource):
         args = parser.parse_args()
         try:
 
-            animal = Animal.query.get(args["idAnimal"])
+            animal = Animal.query.get(args["animal_id"])
             if animal is None:
-                logger.error(f"Animal de id: {args['idAnimal']} nao encontrado")
+                logger.error(f"Animal de id: {args['animal_id']} nao encontrado")
 
-                codigo = Message(f"Animal de id: {args['idAnimal']} não encontrado", 1)
+                codigo = Message(f"Animal de id: {args['animal_id']} não encontrado", 1)
                 return marshal(codigo, message_fields), 404
         
-            vacina = Vacina.query.get(args["idVacina"])
+            vacina = Vacina.query.get(args["vacina_id"])
             if vacina is None:
-                logger.error(f"Vacina de id: {args['idVacina']} nao encontrada")
+                logger.error(f"Vacina de id: {args['vacina_id']} nao encontrada")
 
-                codigo = Message(f"Vacina de id: {args['idVacina']} não encontrada", 1)
+                codigo = Message(f"Vacina de id: {args['vacina_id']} não encontrada", 1)
                 return marshal(codigo, message_fields), 404
             
             animal.vacinas.append(vacina)
             db.session.add(animal)
             db.session.commit()
 
-            logger.info(f"Vacina de id: {args['idVacina']} foi associada ao animal de id: {args['idAnimal']}")
+            logger.info(f"Vacina de id: {args['vacina_id']} foi associada ao animal de id: {args['animal_id']}")
             return marshal(animal, animal_fields), 201
-        except:
-            logger.error(f"Erro ao criar a vacina")
-            codigo = Message(f"Erro ao criar a vacina", 2)
+        except Exception as e:
+            logger.error(f"Erro ao criar a vacina: {str(e)}")
+            codigo = Message(f"Erro ao criar a vacina: {str(e)}", 2)
             return marshal(codigo, message_fields), 400

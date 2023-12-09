@@ -11,10 +11,7 @@ parser.add_argument('nome', type=str, help='Problema no nome', required=True)
 parser.add_argument('especie', type=str, help='Problema no especie', required=True)
 parser.add_argument('raca', type=str, help='Problema no raca', required=True)
 parser.add_argument('idade', type=int, help='Problema no idade', required=True)
-parser.add_argument('origem', type=str, help='Problema no origem', required=True)
-parser.add_argument('descricao_origem', type=str, help='Problema na descricao de origem', required=True)
 parser.add_argument('vacina_em_dia', type=bool, help='Problema se as vacinas estão em dia', required=True)
-# parser.add_argument('vacina', type=str, help='Problema no registro das vacinas', required=True)
 
 class Animais(Resource):
     def get(self):
@@ -31,8 +28,6 @@ class Animais(Resource):
             especie = args["especie"]
             raca = args["raca"]
             idade = args["idade"]
-            origem = args["origem"]
-            descricao_origem = args["descricao_origem"]
             vacina_em_dia = args["vacina_em_dia"]
 
 
@@ -41,8 +36,6 @@ class Animais(Resource):
                 not nome or len(nome) < 3 or
                 not especie or len(especie) < 3 or
                 not raca or len(raca) < 3 or
-                not origem or len(origem) < 3 or
-                not descricao_origem or len(descricao_origem) < 3 or
                 idade <= 0
             ):
                 return {"message": "Campos obrigatórios não podem ser nulos e devem ter no mínimo três caracteres, e a idade deve ser maior que zero"}, 400
@@ -51,7 +44,7 @@ class Animais(Resource):
                 return {"message": "O valor de 'vacina_em_dia' deve ser True ou False"}, 400
 
 
-            animal = Animal(nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia, nome_arquivo)
+            animal = Animal(nome, especie, raca, idade, vacina_em_dia)
 
 
             db.session.add(animal)
@@ -74,7 +67,7 @@ class AnimalById(Resource):
             logger.error(f"Animal {id} não encontrada")
 
             message = Message(f"Animal {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Animal {id} encontrada com sucesso!")
         return marshal(animal, animal_fields)
@@ -95,10 +88,7 @@ class AnimalById(Resource):
             animal.especie = args["especie"]
             animal.raca = args["raca"]
             animal.idade = args["idade"]
-            animal.origem = args["origem"]
-            animal.descricao_origem = args["descricao_origem"]
             animal.vacina_em_dia = args["vacina_em_dia"]
-            animal.vacina = args["vacina"]
 
             db.session.add(animal)
             db.session.commit()
@@ -134,21 +124,21 @@ class AnimalByNome(Resource):
             logger.error(f"Animal {id} não encontrado")
 
             message = Message(f"Animal {id} não encontrado", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Animal {id} encontrado com sucesso!")
         return marshal(animal, animal_fields), 200
 
-class AnimalMe(Resource):
-    def get(self):
-        animal = Animal.query
+# class AnimalMe(Resource):
+#     def get(self):
+#         animal = Animal.query
 
-        if animal is None:
-            logger.error(f"Animal {id} não encontrada")
+#         if animal is None:
+#             logger.error(f"Animal {id} não encontrada")
 
-            message = Message(f"Animal {id} não encontrada", 1)
-            return marshal(message), 404
+#             message = Message(f"Animal {id} não encontrada", 1)
+#             return marshal(message, message_fields), 404
 
-        logger.info(f"Animal {id} encontrada com sucesso!")
-        return marshal(animal, animal_fields), 200
+#         logger.info(f"Animal {id} encontrada com sucesso!")
+#         return marshal(animal, animal_fields), 200
 
