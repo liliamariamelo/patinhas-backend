@@ -54,7 +54,7 @@ class VacinasById(Resource):
             logger.error(f"Vacina {id} não encontrada")
 
             message = Message(f"Vacina {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"Vacina {id} encontrada com sucesso!")
         return marshal(vacina, vacina_fields)
@@ -100,29 +100,29 @@ class VacinasById(Resource):
 class AnimalVacina(Resource):
     def post(self):
         args = parser.parse_args()
-        try:
+        # try:
 
-            animal = Animal.query.get(args["animal_id"])
-            if animal is None:
-                logger.error(f"Animal de id: {args['animal_id']} nao encontrado")
+        animal = Animal.query.get(args["animal_id"])
+        if animal is None:
+            logger.error(f"Animal de id: {args['animal_id']} nao encontrado")
 
-                codigo = Message(f"Animal de id: {args['animal_id']} não encontrado", 1)
-                return marshal(codigo, message_fields), 404
+            codigo = Message(f"Animal de id: {args['animal_id']} não encontrado", 1)
+            return marshal(codigo, message_fields), 404
+    
+        vacina = Vacina.query.get(args["vacina_id"])
+        if vacina is None:
+            logger.error(f"Vacina de id: {args['vacina_id']} nao encontrada")
+
+            codigo = Message(f"Vacina de id: {args['vacina_id']} não encontrada", 1)
+            return marshal(codigo, message_fields), 404
         
-            vacina = Vacina.query.get(args["vacina_id"])
-            if vacina is None:
-                logger.error(f"Vacina de id: {args['vacina_id']} nao encontrada")
+        animal.vacinas.append(vacina)
+        db.session.add(animal)
+        db.session.commit()
 
-                codigo = Message(f"Vacina de id: {args['vacina_id']} não encontrada", 1)
-                return marshal(codigo, message_fields), 404
-            
-            animal.vacinas.append(vacina)
-            db.session.add(animal)
-            db.session.commit()
-
-            logger.info(f"Vacina de id: {args['vacina_id']} foi associada ao animal de id: {args['animal_id']}")
-            return marshal(animal, animal_fields), 201
-        except Exception as e:
-            logger.error(f"Erro ao criar a vacina: {str(e)}")
-            codigo = Message(f"Erro ao criar a vacina: {str(e)}", 2)
-            return marshal(codigo, message_fields), 400
+        logger.info(f"Vacina de id: {args['vacina_id']} foi associada ao animal de id: {args['animal_id']}")
+        return marshal(animal, animal_fields), 201
+        # except Exception as e:
+        #     logger.error(f"Erro ao criar a vacina: {str(e)}")
+        #     codigo = Message(f"Erro ao criar a vacina: {str(e)}", 2)
+        #     return marshal(codigo, message_fields), 400

@@ -1,5 +1,5 @@
 from flask_restful import Resource, reqparse, marshal
-from psycopg2 import IntegrityError
+from sqlalchemy.exc import IntegrityError
 from model.ong import *
 from model.message import *
 from helpers.database import db
@@ -28,19 +28,12 @@ class ONGs(Resource):
 
     def post(self):
         padrao_email =  r'^[\w\.-]+@[\w\.-]+\.\w+$'
-        padrao_senha = PasswordPolicy.from_names(
-            length = 8,
-            uppercase = 1,
-            numbers = 1,
-            special = 1
-        )
         args = parser.parse_args()
         try:
             nome = args["nome"]
             cnpj = args["cnpj"]
             telefone = args["telefone"]
             email = args["email"]
-            senha = args["senha"]
             logradouro = args["logradouro"],
             numero = args["numero"],
             bairro = args["bairro"],
@@ -84,17 +77,8 @@ class ONGs(Resource):
                 message = Message("Telefone informado incorretamente", 2)
                 return marshal(message, message_fields), 400
 
-            if not senha:
-                logger.info("Senha não informada")
-                message = Message("Senha não informada", 2)
-                return marshal(message, message_fields), 400
 
-            verifySenha = padrao_senha.test(senha)
-            if len(verifySenha) != 0:
-                message = Message("Senha informada incorretamente", 2)
-                return marshal(message, message_fields), 400
-
-            ong = ONG(nome, cnpj, telefone, email, senha, logradouro, numero, bairro, cep, cidade, id_gestor)
+            ong = ONG(nome, cnpj, telefone, email, logradouro, numero, bairro, cep, cidade, id_gestor)
 
             db.session.add(ong)
             db.session.commit()
@@ -128,7 +112,7 @@ class ONGById(Resource):
             logger.error(f"ONG {id} não encontrada")
 
             message = Message(f"ONG {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"ONG {id} encontrada com sucesso!")
         return marshal(ong, ong_fields)
@@ -149,7 +133,6 @@ class ONGById(Resource):
             ong.cnpj = args["cnpj"]
             ong.telefone = args["telefone"]
             ong.email = args["email"]
-            ong.senha = args["senha"]
             ong.logradouro = args["logradouro"]
             ong.numero = args["numero"]
             ong.bairro = args["bairro"]
@@ -190,7 +173,7 @@ class ONGByNome(Resource):
             logger.error(f"ONG {id} não encontrado")
 
             message = Message(f"ONG {id} não encontrado", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"ONG {id} encontrado com sucesso!")
         return marshal(ong, ong_fields), 200
@@ -203,7 +186,7 @@ class ONGMe(Resource):
             logger.error(f"ONG {id} não encontrada")
 
             message = Message(f"ONG {id} não encontrada", 1)
-            return marshal(message), 404
+            return marshal(message, message_fields), 404
 
         logger.info(f"ONG {id} encontrada com sucesso!")
         return marshal(ong, ong_fields), 200

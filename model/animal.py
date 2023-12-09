@@ -10,6 +10,7 @@ animal_fields = {
   'raca': fields.String,
   'idade': fields.Integer,
   'vacina_em_dia': fields.Boolean,
+  'vacinas': fields.List(fields.Nested(vacina_fields))
 }
 
 
@@ -22,8 +23,8 @@ class Animal(db.Model):
   especie = db.Column(db.String, nullable=False)
   raca = db.Column(db.String, nullable=False)
   idade = db.Column(db.Integer, nullable=False)
-
   vacina_em_dia = db.Column(db.Boolean, nullable=False)
+  vacinas = db.relationship("Vacina", backref="animal")
 
   def __init__(self, nome, especie, raca, idade, vacina_em_dia):
     self.nome = nome

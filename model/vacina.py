@@ -4,7 +4,6 @@ from helpers.database import db
 vacina_fields = {
   'id': fields.Integer,
   'nome': fields.String,
-  'animal_id':fields.Integer
 }
 
 
@@ -15,8 +14,6 @@ class Vacina(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   nome = db.Column(db.String, nullable=False)
   animal_id = db.Column(db.Integer, db.ForeignKey("animal.id"), nullable=True)
-
-  animal = db.relationship("Animal", uselist=False )
 
   def __init__(self, nome, animal_id):
     self.nome = nome

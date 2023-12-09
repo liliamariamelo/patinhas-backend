@@ -43,6 +43,7 @@ class Animais(Resource):
             if vacina_em_dia not in [True, False]:
                 return {"message": "O valor de 'vacina_em_dia' deve ser True ou False"}, 400
 
+            
 
             animal = Animal(nome, especie, raca, idade, vacina_em_dia)
 

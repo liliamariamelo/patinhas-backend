@@ -25,7 +25,6 @@ class ONG(db.Model):
   cnpj = db.Column(db.String, unique=True, nullable=False)
   telefone = db.Column(db.String, nullable=False)
   email = db.Column(db.String, unique=True, nullable=False)
-  senha = db.Column(db.String, nullable=False)
   logradouro = db.Column(db.String, nullable=False)
   numero = db.Column(db.String, nullable=False)
   bairro = db.Column(db.String, nullable=False)
@@ -35,12 +34,11 @@ class ONG(db.Model):
 
   gestor = db.relationship("Gestor", uselist=False)
 
-  def __init__(self, nome, cnpj, telefone, email, senha, logradouro, numero, bairro, cep, cidade, id_gestor):
+  def __init__(self, nome, cnpj, telefone, email, logradouro, numero, bairro, cep, cidade, id_gestor):
     self.nome = nome
     self.cnpj = cnpj
     self.telefone = telefone
     self.email = email
-    self.senha = senha
     self.logradouro = logradouro
     self.numero = numero
     self.bairro = bairro

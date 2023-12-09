@@ -9,15 +9,15 @@ from resources.pessoa import Pessoas
 from resources.parceiro import Parceiros, ParceiroById, ParceiroByNome
 from resources.gestor import Gestores, GestorById, GestorByNome
 from resources.ong import ONGs, ONGByNome, ONGById
-from resources.animal import Animais
+from resources.animal import Animais, AnimalById
 from resources.listar import ListarTodos
 from resources.deletar import  DeletarParceiro, DeletarAnimal, DeletarGestor, DeletarOng
 from resources.atualizar import  AtualizarParceiro, AtualizarGestor, AtualizarAnimal, AtualizarOng
 from resources.adicionar import  AdicionarAnimal, AdicionarGestor, AdicionarParceiro
 from resources.adicionarongadmin import AdicionarONG
-from resources.vacina import AnimalVacina, Vacinas
-from resources.agendamento import Agendamentos
-from resources.relatoriodespesas import RelatoriosDespesas, RelatorioDespesasByMes
+from resources.vacina import AnimalVacina, Vacinas, VacinasById
+from resources.agendamento import Agendamentos, AgendamentoById
+from resources.relatoriodespesas import RelatoriosDespesas, RelatorioDespesasByMes, RelatorioDespesasById
 load_dotenv()
 
 # create the app
@@ -54,6 +54,7 @@ api.add_resource(ONGs, '/ongs')
 api.add_resource(ONGById, '/ongs/<int:id>')
 api.add_resource(ONGByNome,'/ongs/<nome>')
 api.add_resource(Animais, '/animais')
+api.add_resource(AnimalById, '/animais/<int:id>')
 
 api.add_resource(ListarTodos, '/listartodos')
 
@@ -72,12 +73,16 @@ api.add_resource(AdicionarParceiro, '/adicionarparceiro')
 api.add_resource(AdicionarGestor, '/adicionargestor')
 api.add_resource(AdicionarONG, '/adicionarong')
 
-api.add_resource(Vacinas, '/vacina')
+api.add_resource(Vacinas, '/vacinas')
+api.add_resource(VacinasById, '/vacinas/<int:id>')
 api.add_resource(AnimalVacina, '/AnimalVacina')
 
 api.add_resource(Agendamentos, '/agendamento')
+api.add_resource(AgendamentoById, '/agendamento/<int:id>')
 
 api.add_resource(RelatoriosDespesas, '/relatorio')
+api.add_resource(RelatorioDespesasById, '/relatorio/<int:id>')
+
 api.add_resource(RelatorioDespesasByMes, '/relatoriobusca/<int:mes_Correspondente>')
 
 

@@ -9,7 +9,6 @@ parceiro_fields = {
   'nascimento': fields.String,
   'telefone': fields.String,
   'email': fields.String,
-  'senha': fields.String
 }
 
 class Parceiro(Pessoa):

@@ -13,7 +13,6 @@ gestor_fields = {
   'nascimento': DateFormat,
   'telefone': fields.String,
   'email': fields.String,
-  'senha': fields.String,
 }
 
 class Gestor(Pessoa):

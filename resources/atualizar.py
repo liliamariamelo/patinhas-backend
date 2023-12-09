@@ -37,7 +37,7 @@ class AtualizarParceiro(Resource):
             if parceiro is None:
                 logger.error(f"Parceiro {id} não encontrada")
                 message = Message(f"Parceiro {id} não encontrada", 1)
-                return marshal(message, message_fields)
+                return marshal(message, message_fields), 404
             
             if args['nome']:
                 parceiro.nome = args['nome']
@@ -210,8 +210,6 @@ class AtualizarAnimal(Resource):
         parser.add_argument('especie', type=str)
         parser.add_argument('raca', type=str)
         parser.add_argument('idade', type=str)
-        parser.add_argument('origem', type=str)
-        parser.add_argument('descricao_origem', type=str)
         parser.add_argument('vacina_em_dia', type=bool)
         args = parser.parse_args()
 
@@ -232,10 +230,6 @@ class AtualizarAnimal(Resource):
                 animal.raca = args['raca']
             if args['idade']:
                 animal.idade = args['idade']
-            if args['origem']:
-                animal.origem = args['origem']
-            if args['descricao_origem']:
-                animal.descricao_origem = args['descricao_origem']
             if args['vacina_em_dia']:
                 animal.vacina_em_dia = args['vacina_em_dia']
 
@@ -254,20 +248,9 @@ class AtualizarAnimal(Resource):
                 message = Message("Raça não informado ou não tem no mínimo 3 caracteres", 2)
                 return marshal(message, message_fields), 400
             
-            if not args['origem'] or len(args['origem']) < 3:
-                logger.info("Origem não informado ou não tem no mínimo 3 caracteres")
-                message = Message("Origem não informado ou não tem no mínimo 3 caracteres", 2)
-                return marshal(message, message_fields), 400
-            
             if not args['idade'] or len(args['idade']) < 0:
                 logger.info("Idade não informado ou não tem no mínimo 3 caracteres")
                 message = Message("Idade não informado ou não tem no mínimo 3 caracteres", 2)
-                return marshal(message, message_fields), 400
-            
-        
-            if not args['descricao_origem'] or len(args['descricao_origem']) < 3:
-                logger.info("Descrição de origem  não informado ou não tem no mínimo 3 caracteres")
-                message = Message("Descrição de origem  não informado ou não tem no mínimo 3 caracteres", 2)
                 return marshal(message, message_fields), 400
             
             if args['vacina_em_dia'] not in [True, False]:

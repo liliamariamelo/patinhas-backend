@@ -1,5 +1,6 @@
 from flask_restful import fields
 from helpers.database import db
+from werkzeug.security import generate_password_hash, check_password_hash
 
 
 class DateFormat(fields.Raw):
@@ -41,7 +42,10 @@ class Pessoa(db.Model):
     self.nascimento = nascimento
     self.telefone = telefone
     self.email = email
-    self.senha = senha
+    self.senha = generate_password_hash(senha)
+
+  def verify_password(self, senha):
+    return check_password_hash(self.senha, senha)
 
   def __repr__(self):
     return f'<Pessoa {self.nome}>'

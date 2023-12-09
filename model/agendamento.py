@@ -14,8 +14,11 @@ class TimeFormat(fields.Raw):
       return value.strftime('%H:%M')
 
 agendamento_fields = {
+    'id': fields.Integer,
     'data_visita': DateFormat,
     'hora_visita': TimeFormat,
+    'nomeAnimal': fields.String,
+    'nomeParceiro': fields.String,
     'id_animal': fields.Integer,
     'id_parceiro': fields.Integer,
 }
@@ -26,7 +29,9 @@ class Agendamento(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
     data_visita = db.Column(db.Date, nullable=False)
-    hora_visita = db.Column(db.DateTime, nullable=False)
+    hora_visita = db.Column(db.Time, nullable=False)
+    nomeAnimal = db.Column(db.String, nullable=True)
+    nomeParceiro = db.Column(db.String, nullable=True)
     id_animal = db.Column(db.Integer, db.ForeignKey("animal.id"), nullable=True)
     id_parceiro = db.Column(db.Integer, db.ForeignKey("parceiro_ong.pessoa_id"), nullable=True)
 
@@ -38,6 +43,8 @@ class Agendamento(db.Model):
         self.hora_visita = hora_visita
         self.animal = animal
         self.parceiro = parceiro
+        self.nomeAnimal = animal.nome
+        self.nomeParceiro = parceiro.nome
 
     def hora_formatada(self):
         return self.hora_visita.strftime('%H:%M')

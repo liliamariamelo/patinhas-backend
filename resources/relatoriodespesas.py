@@ -4,12 +4,13 @@ from model.message import *
 from helpers.database import db
 from helpers.base_logger import logger
 
+def parse_date(date_string):
+  return datetime.strptime(date_string, '%Y-%m-%d')
 
 parser = reqparse.RequestParser()
 parser.add_argument('categoria', type=str, help='Problema na categoria', required=True)
 parser.add_argument('valor', type=float, help='Problema no valor das despesas', required=True)
-parser.add_argument('data', type=str, help='Problema na data', required=True)
-parser.add_argument('observacoes', type=str, help='Problema nas observações', required=True)
+parser.add_argument('data', type=parse_date, help='Problema na data', required=True)
 parser.add_argument('mes_Correspondente', type=int, help='Problema no mês correspondente', required=True)
 
 class RelatoriosDespesas(Resource):
@@ -25,10 +26,9 @@ class RelatoriosDespesas(Resource):
             categoria = args["categoria"]
             valor = args["valor"]
             data = args["data"]
-            observacoes = args["observacoes"]
             mes_Correspondente = args["mes_Correspondente"]
 
-            relatorio = RelatorioDespesas(categoria, valor, data, observacoes, mes_Correspondente)
+            relatorio = RelatorioDespesas(categoria, valor, data, mes_Correspondente)
 
             db.session.add(relatorio)
             db.session.commit()
@@ -73,7 +73,6 @@ class RelatorioDespesasById(Resource):
             relatorio.categoria = args["categoria"]
             relatorio.valor = args["valor"]
             relatorio.data = args["data"]
-            relatorio.observacoes = args["observacoes"]
             relatorio.mes_Correspondente = args["mes_Correspondente"]
 
             db.session.add(relatorio)

@@ -1,8 +1,8 @@
-"""empty message
+"""First Commit
 
-Revision ID: 22007d4dbb75
+Revision ID: e7f7e8128f9f
 Revises: 
-Create Date: 2023-12-07 16:59:49.136009
+Create Date: 2023-12-09 12:05:00.310822
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = '22007d4dbb75'
+revision = 'e7f7e8128f9f'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -24,8 +24,6 @@ def upgrade():
     sa.Column('especie', sa.String(), nullable=False),
     sa.Column('raca', sa.String(), nullable=False),
     sa.Column('idade', sa.Integer(), nullable=False),
-    sa.Column('origem', sa.String(), nullable=False),
-    sa.Column('descricao_origem', sa.String(), nullable=False),
     sa.Column('vacina_em_dia', sa.Boolean(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -33,10 +31,10 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(), nullable=False),
     sa.Column('cpf', sa.String(), nullable=False),
-    sa.Column('email', sa.String(), nullable=False),
-    sa.Column('senha', sa.String(), nullable=False),
     sa.Column('nascimento', sa.Date(), nullable=False),
     sa.Column('telefone', sa.String(), nullable=False),
+    sa.Column('email', sa.String(), nullable=False),
+    sa.Column('senha', sa.String(), nullable=False),
     sa.Column('tipo', sa.String(), nullable=False),
     sa.PrimaryKeyConstraint('id'),
     sa.UniqueConstraint('cpf'),
@@ -47,8 +45,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('categoria', sa.String(), nullable=False),
     sa.Column('valor', sa.Float(), nullable=False),
-    sa.Column('data', sa.String(), nullable=False),
-    sa.Column('observacoes', sa.String(), nullable=True),
+    sa.Column('data', sa.Date(), nullable=False),
     sa.Column('mes_Correspondente', sa.Integer(), nullable=False),
     sa.PrimaryKeyConstraint('id')
     )
@@ -71,8 +68,8 @@ def upgrade():
     )
     op.create_table('agendamento',
     sa.Column('id', sa.Integer(), nullable=False),
-    sa.Column('data_visita', sa.String(), nullable=False),
-    sa.Column('hora_visita', sa.String(), nullable=False),
+    sa.Column('data_visita', sa.Date(), nullable=False),
+    sa.Column('hora_visita', sa.Time(), nullable=False),
     sa.Column('id_animal', sa.Integer(), nullable=True),
     sa.Column('id_parceiro', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['id_animal'], ['animal.id'], ),
@@ -83,17 +80,14 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('nome', sa.String(), nullable=False),
     sa.Column('cnpj', sa.String(), nullable=False),
+    sa.Column('telefone', sa.String(), nullable=False),
     sa.Column('email', sa.String(), nullable=False),
     sa.Column('senha', sa.String(), nullable=False),
-    sa.Column('telefone', sa.String(), nullable=False),
     sa.Column('logradouro', sa.String(), nullable=False),
     sa.Column('numero', sa.String(), nullable=False),
     sa.Column('bairro', sa.String(), nullable=False),
-    sa.Column('complemento', sa.String(), nullable=False),
-    sa.Column('referencia', sa.String(), nullable=False),
     sa.Column('cep', sa.String(), nullable=False),
     sa.Column('cidade', sa.String(), nullable=False),
-    sa.Column('estado', sa.String(), nullable=False),
     sa.Column('id_gestor', sa.Integer(), nullable=True),
     sa.ForeignKeyConstraint(['id_gestor'], ['gestor_ong.pessoa_id'], ),
     sa.PrimaryKeyConstraint('id'),
