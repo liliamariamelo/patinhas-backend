@@ -18,6 +18,7 @@ from resources.adicionarongadmin import AdicionarONG
 from resources.vacina import AnimalVacina, Vacinas
 from resources.agendamento import Agendamentos
 from resources.relatoriodespesas import RelatoriosDespesas, RelatorioDespesasByMes
+from resources.notificacaoAgendamento import EnviarEmailAgendamento
 load_dotenv()
 
 # create the app
@@ -79,6 +80,8 @@ api.add_resource(Agendamentos, '/agendamento')
 
 api.add_resource(RelatoriosDespesas, '/relatorio')
 api.add_resource(RelatorioDespesasByMes, '/relatoriobusca/<int:mes_Correspondente>')
+
+api.add_resource(EnviarEmailAgendamento, '/enviar_email')
 
 
 

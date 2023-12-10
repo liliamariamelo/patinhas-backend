@@ -13,7 +13,7 @@ parceiro_fields = {
 
 class Parceiro(db.Model):
     __tablename__ = "parceiro_ong"
-    
+
     id = db.Column(db.Integer, primary_key=True)
     nome = db.Column(db.String, nullable=False)
     cpf = db.Column(db.String, unique=True, nullable=False)
@@ -22,8 +22,7 @@ class Parceiro(db.Model):
     email = db.Column(db.String, unique=True, nullable=False)
     senha = db.Column(db.String, nullable=False)
 
-    #agendamentos = db.relationship("Agendamento", backref="parceiro")
-    
+    agendamentos = db.relationship("Agendamento", backref="parceiro")
 
     def __init__(self, nome, cpf, nascimento, telefone,  email, senha):
       self.nome = nome
@@ -32,7 +31,7 @@ class Parceiro(db.Model):
       self.telefone = telefone
       self.email = email
       self.senha = senha
-     
+
 
     def __repr__(self):
         return f'<Parceiro da Ong>'

@@ -26,9 +26,8 @@ class Agendamentos(Resource):
             id_animal = args["id_animal"]
             id_parceiro = args["id_parceiro"]
 
-                        
-            datetime.strptime(data_visita, '%Y-%m-%d')
-            datetime.strptime(hora_visita, '%H:%M:%S')
+            data_visita = datetime.strptime(data_visita, '%Y-%m-%d')
+            hora_visita = datetime.strptime(hora_visita, '%H:%M:%S')
 
             agendamento = Agendamento(data_visita, hora_visita, id_animal, id_parceiro)
 
