@@ -42,9 +42,8 @@ class Animal(db.Model):
     self.descricao_origem = descricao_origem
     self.vacina_em_dia = vacina_em_dia
 
-    
+
   def __repr__(self):
     return f'<Animal {self.nome}>'
-  
 
-  
+

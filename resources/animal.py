@@ -51,7 +51,7 @@ class Animais(Resource):
                 return {"message": "O valor de 'vacina_em_dia' deve ser True ou False"}, 400
 
 
-            animal = Animal(nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia, nome_arquivo)
+            animal = Animal(nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia)
 
 
             db.session.add(animal)

@@ -19,6 +19,7 @@ class Agendamento(db.Model):
     id_animal = db.Column(db.Integer, db.ForeignKey("animal.id"), nullable=True)
     id_parceiro = db.Column(db.Integer, db.ForeignKey("parceiro_ong.id"), nullable=True)
 
+
     def __init__(self, data_visita, hora_visita, id_animal, id_parceiro):
         self.data_visita = data_visita
         self.hora_visita = hora_visita
