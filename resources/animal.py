@@ -1,8 +1,10 @@
 from flask_restful import Resource, reqparse, marshal
-from model.animal import *
+from model.animal import Animal, animal_fields
+from model.vacina import *
 from model.message import *
 from helpers.base_logger import logger
 from helpers.database import db
+
 
 parser = reqparse.RequestParser()
 parser.add_argument('nome', type=str, help='Problema no nome', required=True)
@@ -12,7 +14,7 @@ parser.add_argument('idade', type=int, help='Problema no idade', required=True)
 parser.add_argument('origem', type=str, help='Problema no origem', required=True)
 parser.add_argument('descricao_origem', type=str, help='Problema na descricao de origem', required=True)
 parser.add_argument('vacina_em_dia', type=bool, help='Problema se as vacinas estão em dia', required=True)
-#parser.add_argument('vacina', type=list, help='Problema no registro das vacinas', required=True)
+# parser.add_argument('vacina', type=str, help='Problema no registro das vacinas', required=True)
 
 class Animais(Resource):
     def get(self):
@@ -23,6 +25,7 @@ class Animais(Resource):
     def post(self):
         args = parser.parse_args()
 
+
         try:
             nome = args["nome"]
             especie = args["especie"]
@@ -31,6 +34,8 @@ class Animais(Resource):
             origem = args["origem"]
             descricao_origem = args["descricao_origem"]
             vacina_em_dia = args["vacina_em_dia"]
+
+
 
             if (
                 not nome or len(nome) < 3 or
@@ -45,18 +50,11 @@ class Animais(Resource):
             if vacina_em_dia not in [True, False]:
                 return {"message": "O valor de 'vacina_em_dia' deve ser True ou False"}, 400
 
-        
+
             animal = Animal(nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia)
 
+
             db.session.add(animal)
-           
-           # vacina = Vacina(
-            #    args["vacina"]["nome"],
-             #   animal
-            #)
-
-           # db.session.add(vacina)
-
             db.session.commit()
 
             logger.info("Animal cadastrado com sucesso!")
@@ -100,6 +98,7 @@ class AnimalById(Resource):
             animal.origem = args["origem"]
             animal.descricao_origem = args["descricao_origem"]
             animal.vacina_em_dia = args["vacina_em_dia"]
+            animal.vacina = args["vacina"]
 
             db.session.add(animal)
             db.session.commit()
@@ -112,7 +111,7 @@ class AnimalById(Resource):
             message = Message("Erro ao atualizar animal", 2)
             return marshal(message, message_fields), 404
 
-   
+
     def delete(self, id):
         animal = Animal.query.get(id)
 
@@ -152,3 +151,4 @@ class AnimalMe(Resource):
 
         logger.info(f"Animal {id} encontrada com sucesso!")
         return marshal(animal, animal_fields), 200
+

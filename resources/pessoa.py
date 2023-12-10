@@ -23,7 +23,7 @@ class Pessoas(Resource):
         pessoas = Pessoa.query.all()
         return marshal(pessoas, pessoa_fields), 200
 
-    
+
     def post(self):
         padrao_email =  r'^[\w\.-]+@[\w\.-]+\.\w+$'
         padrao_senha = PasswordPolicy.from_names(
@@ -34,7 +34,7 @@ class Pessoas(Resource):
         )
         args = parser.parse_args()
         try:
-           
+
             nome = args["nome"]
             cpf = args["cpf"]
             email = args["email"]
@@ -47,12 +47,12 @@ class Pessoas(Resource):
                 logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
                 message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not nascimento:
                 logger.info("nascimento não informado")
                 message = Message("nascimento não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not email:
                 logger.info("Email não informado")
                 message = Message("Email não informado", 2)
@@ -62,37 +62,37 @@ class Pessoas(Resource):
                 logger.info("Email informado incorretamente")
                 message = Message("Email informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not cpf:
                 logger.info("CPF não informado")
                 message = Message("CPF não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not re.match(r'^\d{3}\.\d{3}\.\d{3}\-\d{2}$', cpf):
                 logger.info("CPF não informado")
                 message = Message("CPF informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not telefone:
                 logger.info("Telefone não informado")
                 message = Message("Telefone não informado", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not re.match(r'^\d{11}$', telefone):
                 logger.info("Telefone não informado")
                 message = Message("Telefone informado incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
             if not senha:
                 logger.info("Senha não informada")
                 message = Message("Senha não informada", 2)
                 return marshal(message, message_fields), 400
-            
+
             verifySenha = padrao_senha.test(senha)
             if len(verifySenha) != 0:
                 message = Message("Senha informada incorretamente", 2)
                 return marshal(message, message_fields), 400
-            
+
 
             pessoa = Pessoa(nome, cpf, email, senha, nascimento, telefone)
 
@@ -102,12 +102,12 @@ class Pessoas(Resource):
             logger.info("Pessoa cadastrada com sucesso!")
 
             return marshal(pessoa, pessoa_fields), 201
-        
+
         except IntegrityError as e:
             if 'cpf' in str(e.orig):
                 message = Message("CPF já existe!", 2)
                 return marshal(message, message_fields), 409
-            
+
             elif 'email' in str(e.orig):
                 message = Message("Email já existe!", 2)
                 return marshal(message, message_fields), 409
@@ -149,7 +149,7 @@ class PessoaById(Resource):
             pessoa.senha = args["senha"]
             pessoa.nascimento = args["nascimento"]
             pessoa.telefone = args["telefone"]
-            
+
             db.session.add(pessoa)
             db.session.commit()
 
@@ -161,7 +161,7 @@ class PessoaById(Resource):
             message = Message("Erro ao atualizar pessoa", 2)
             return marshal(message, message_fields), 404
 
-   
+
     def delete(self, id):
         pessoa = Pessoa.query.get(id)
 

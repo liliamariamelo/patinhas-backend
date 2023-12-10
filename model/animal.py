@@ -1,6 +1,7 @@
 from flask_restful import fields
 from helpers.database import db
-#from model.vacina import * 
+from model.vacina import vacina_fields
+
 
 animal_fields = {
   'id': fields.Integer,
@@ -10,8 +11,11 @@ animal_fields = {
   'idade': fields.Integer,
   'origem' : fields.String, #resgatado ou doado
   'descricao_origem' : fields.String,
-  'vacina_em_dia': fields.Boolean
+  'vacina_em_dia': fields.Boolean,
+  'vacinas' : fields.List(fields.Nested(vacina_fields)),
 }
+
+
 
 class Animal(db.Model):
   __tablename__ = "animal"
@@ -23,7 +27,11 @@ class Animal(db.Model):
   idade = db.Column(db.Integer, nullable=False)
   origem = db.Column(db.String, nullable=False)
   descricao_origem = db.Column(db.String, nullable=False)
+
   vacina_em_dia = db.Column(db.Boolean, nullable=False)
+
+  vacinas = db.relationship("Vacina", backref="animal")
+
 
   def __init__(self, nome, especie, raca, idade, origem, descricao_origem, vacina_em_dia):
     self.nome = nome
@@ -33,6 +41,9 @@ class Animal(db.Model):
     self.origem = origem
     self.descricao_origem = descricao_origem
     self.vacina_em_dia = vacina_em_dia
-    
+
+
   def __repr__(self):
     return f'<Animal {self.nome}>'
+
+

@@ -1,6 +1,7 @@
-from flask_restful import Resource, reqparse, marshal
 from psycopg2 import IntegrityError
+from flask_restful import Resource, reqparse, marshal
 from model.ong import *
+from model.gestor import *
 from model.message import *
 from helpers.database import db
 from helpers.base_logger import logger
@@ -21,14 +22,9 @@ parser.add_argument('referencia', type=str, help='Problema no referencia', requi
 parser.add_argument('cep', type=str, help='Problema no cep', required=True)
 parser.add_argument('cidade', type=str, help='Problema na cidade', required=True)
 parser.add_argument('estado', type=str, help='Problema no estado', required=True)
-parser.add_argument('id_gestor', type=int, help='Problema no id do gestor', required=False)
+parser.add_argument('id_gestor', type=int, help='Problema no id de gestor', required=True)
 
-class ONGs(Resource):
-    def get(self):
-        logger.info("ONGs listadas com sucesso!")
-        ongs = ONG.query.all()
-        return marshal(ongs, ong_fields), 200
-
+class AdicionarONG(Resource):
     def post(self):
         padrao_email =  r'^[\w\.-]+@[\w\.-]+\.\w+$'
         padrao_senha = PasswordPolicy.from_names(
@@ -52,7 +48,7 @@ class ONGs(Resource):
             cep = args["cep"],
             cidade=args["cidade"],
             estado=args["estado"],
-            id_gestor = args["id_gestor"]
+            id_gestor=args["id_gestor"]
             
 
             if not nome or len(nome) < 3:
@@ -99,6 +95,21 @@ class ONGs(Resource):
             if len(verifySenha) != 0:
                 message = Message("Senha informada incorretamente", 2)
                 return marshal(message, message_fields), 400
+            
+            if (
+                not logradouro or len(logradouro) < 3 or
+                not bairro or len(bairro) < 3 or
+                not complemento or len(complemento) < 3 or
+                not referencia or len(referencia) < 3 or
+                not cidade or len(cidade) < 3 or 
+                not estado or len(estado) < 3
+            ):
+                logger.info("O campo não informado ou não tem no mínimo 3 caracteres")
+                message = Message("O campo não informado ou não tem no mínimo 3 caracteres", 2)
+                return marshal(message, message_fields), 400
+
+            db.session.add(ong)
+            db.session.commit()
 
             ong = ONG(nome, cnpj, telefone, email, senha, logradouro, numero, bairro, complemento, referencia, cep, cidade, estado, id_gestor)
 
@@ -126,93 +137,3 @@ class ONGs(Resource):
             return marshal(message, message_fields), 404
 
 
-class ONGById(Resource):
-    def get(self, id):
-        ong = ONG.query.get(id)
-
-        if ong is None:
-            logger.error(f"ONG {id} não encontrada")
-
-            message = Message(f"ONG {id} não encontrada", 1)
-            return marshal(message), 404
-
-        logger.info(f"ONG {id} encontrada com sucesso!")
-        return marshal(ong, ong_fields)
-
-
-    def put(self, id):
-        args = parser.parse_args()
-
-        try:
-            ong = ONG.query.get(id)
-
-            if ong is None:
-                logger.error(f"ONG {id} não encontrada")
-                message = Message(f"ONG {id} não encontrada", 1)
-                return marshal(message, message_fields)
-
-            ong.nome = args["nome"]
-            ong.cnpj = args["cnpj"]
-            ong.telefone = args["telefone"]
-            ong.email = args["email"]
-            ong.senha = args["senha"]
-            ong.logradouro = args["logradouro"]
-            ong.numero = args["numero"]
-            ong.bairro = args["bairro"]
-            ong.complemento = args["complemento"]
-            ong.referencia = args["referencia"]
-            ong.cep = args["cep"]
-            ong.cidade=args["cidade"]
-            ong.estado=args["estado"]
-            ong.id_gestor = args["id_gestor"]
-            
-            db.session.add(ong)
-            db.session.commit()
-
-            logger.info("ONG cadastrada com sucesso!")
-            return marshal(ong, ong_fields), 200
-        except Exception as e:
-            logger.error(f"error: {e}")
-
-            message = Message("Erro ao atualizar a ong", 2)
-            return marshal(message, message_fields), 404
-
-    def delete(self, id):
-        ong = ONG.query.get(id)
-
-        if ong is None:
-            logger.error(f"ONG {id} não encontrada")
-            message = Message(f"ONG {id} não encontrada", 1)
-            return marshal(message, message_fields)
-
-        db.session.delete(ong)
-        db.session.commit()
-
-        message = Message("ONG deletada com sucesso!", 3)
-        return marshal(message, message_fields), 200
-
-class ONGByNome(Resource):
-    def get(self, nome):
-        ong = ONG.query.filter_by(nome=nome).all()
-
-        if ong is None:
-            logger.error(f"ONG {id} não encontrado")
-
-            message = Message(f"ONG {id} não encontrado", 1)
-            return marshal(message), 404
-
-        logger.info(f"ONG {id} encontrado com sucesso!")
-        return marshal(ong, ong_fields), 200
-
-class ONGMe(Resource):
-    def get(self):
-        ong = ONG.query
-
-        if ong is None:
-            logger.error(f"ONG {id} não encontrada")
-
-            message = Message(f"ONG {id} não encontrada", 1)
-            return marshal(message), 404
-
-        logger.info(f"ONG {id} encontrada com sucesso!")
-        return marshal(ong, ong_fields), 200

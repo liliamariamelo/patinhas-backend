@@ -1,20 +1,19 @@
+from psycopg2 import IntegrityError
 from flask_restful import Resource, reqparse, marshal
 from model.gestor import *
-from model.ong import *
 from model.message import *
-from helpers.database import db
 from helpers.base_logger import logger
+from helpers.database import db
 import re
 from password_strength import PasswordPolicy
 
 parser = reqparse.RequestParser()
 parser.add_argument('nome', type=str, help='Problema no nome', required=True)
 parser.add_argument('cpf', type=str, help='Problema no cpf', required=True)
-parser.add_argument('email', type=str, help='Problema no email', required=True)
-parser.add_argument('senha', type=str, help='Problema no senha', required=True)
 parser.add_argument('nascimento', type=str, help='Problema no nascimento', required=True)
 parser.add_argument('telefone', type=str, help='Problema no telefone', required=True)
-parser.add_argument('id_ong', type=int, help='Problema na ONG', required=False)
+parser.add_argument('email', type=str, help='Problema no email', required=True)
+parser.add_argument('senha', type=str, help='Problema no senha', required=True)
 
 
 class Gestores(Resource):
@@ -36,30 +35,14 @@ class Gestores(Resource):
         try:
             nome = args["nome"]
             cpf = args["cpf"]
-            email = args["email"]
-            senha = args["senha"]
             nascimento = args["nascimento"]
             telefone = args["telefone"]
-            id_ong = args["id_ong"]
+            email = args["email"]
+            senha = args["senha"]
 
             if not nome or len(nome) < 3:
                 logger.info("Nome não informado ou não tem no mínimo 3 caracteres")
                 message = Message("Nome não informado ou não tem no mínimo 3 caracteres", 2)
-                return marshal(message, message_fields), 400
-            
-            if not nascimento:
-                logger.info("nascimento não informado")
-                message = Message("nascimento não informado", 2)
-                return marshal(message, message_fields), 400
-            
-            if not email:
-                logger.info("Email não informado")
-                message = Message("Email não informado", 2)
-                return marshal(message, message_fields), 400
-
-            if re.match(padrao_email, email) == None:
-                logger.info("Email informado incorretamente")
-                message = Message("Email informado incorretamente", 2)
                 return marshal(message, message_fields), 400
             
             if not cpf:
@@ -72,10 +55,26 @@ class Gestores(Resource):
                 message = Message("CPF informado incorretamente", 2)
                 return marshal(message, message_fields), 400
             
+            if not nascimento:
+                logger.info("nascimento não informado")
+                message = Message("nascimento não informado", 2)
+                return marshal(message, message_fields), 400
+            
             if not telefone:
                 logger.info("Telefone não informado")
                 message = Message("Telefone não informado", 2)
                 return marshal(message, message_fields), 400
+            
+            if not email:
+                logger.info("Email não informado")
+                message = Message("Email não informado", 2)
+                return marshal(message, message_fields), 400
+
+            if re.match(padrao_email, email) == None:
+                logger.info("Email informado incorretamente")
+                message = Message("Email informado incorretamente", 2)
+                return marshal(message, message_fields), 400
+            
             
             if not re.match(r'^\d{11}$', telefone):
                 logger.info("Telefone não informado")
@@ -92,7 +91,7 @@ class Gestores(Resource):
                 message = Message("Senha informada incorretamente", 2)
                 return marshal(message, message_fields), 400
             
-            gestor = Gestor(nome, cpf, email, senha, nascimento, telefone, id_ong )
+            gestor = Gestor(nome, cpf, nascimento, telefone, email, senha)
 
             db.session.add(gestor)
             db.session.commit()
@@ -141,11 +140,10 @@ class GestorById(Resource):
 
             gestor.nome = args["nome"]
             gestor.cpf = args["cpf"]
-            gestor.email = args["email"]
-            gestor.senha = args["senha"]
             gestor.nascimento = args["nascimento"]
             gestor.telefone = args["telefone"]
-            gestor.id_ong = args["id_ong"]
+            gestor.email = args["email"]
+            gestor.senha = args["senha"]
             
             db.session.add(gestor)
             db.session.commit()
@@ -178,23 +176,23 @@ class GestorByNome(Resource):
         gestor = Gestor.query.filter_by(nome=nome).all()
 
         if gestor is None:
-            logger.error(f"Gestor {id} não encontrado")
+            logger.error(f"Gestor {nome} não encontrado")
 
-            message = Message(f"Gestor {id} não encontrado", 1)
+            message = Message(f"Gestor {nome} não encontrado", 1)
             return marshal(message), 404
 
-        logger.info(f"Gestor {id} encontrado com sucesso!")
+        logger.info(f"Gestor {nome} encontrado com sucesso!")
         return marshal(gestor, gestor_fields), 200
 
 class GestorMe(Resource):
     def get(self):
-        gestor = Gestor.query
+        gestor = Gestor.query.first()  # Use first() para obter um gestor específico
 
         if gestor is None:
-            logger.error(f"Gestor {id} não encontrada")
+            logger.error("Gestor não encontrado")
 
-            message = Message(f"Gestor {id} não encontrada", 1)
+            message = Message("Gestor não encontrado", 1)
             return marshal(message), 404
 
-        logger.info(f"Gestor {id} encontrada com sucesso!")
+        logger.info("Gestor encontrado com sucesso!")
         return marshal(gestor, gestor_fields), 200
